@@ -1,0 +1,9 @@
+#greeting {
+  font-family: Roboto-Thin;
+  font-size: 3em;
+}
+
+#summoner-greeting {
+  font-family: Roboto-Bold;
+  color: #F44336;
+}
