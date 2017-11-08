@@ -1,8 +1,20 @@
 <html>
 <head>
+	<meta charset="utf-8" />
   <title>lol coach</title>
+  <link rel="stylesheet" type="text/css" href="/css/style.css">
 </head>
 <body>
-  <h1>lol coach</h1>
+  <div id="title">lol coach</div>
+
+  <form id="search-form" action="/search" method="POST">
+    <input id="summoner" name="summoner" type="text" placeholder="Summoner name">
+    <select id="server" name="server">
+      <option value="NA">NA</option>
+      <option value="EUW">EUW</option>
+      <option value="KR">KR</option>
+    </select>
+    <button type="submit">GO</button>
+  </form>
 </body>
 </html>
