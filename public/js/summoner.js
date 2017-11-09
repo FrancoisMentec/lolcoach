@@ -82,7 +82,7 @@ function updateStatsPlayer () {
   })
 }
 
-
+var statsLayout = document.getElementById('stats-layout')
 class Stat {
   constructor (name) {
     this.name = name
@@ -97,7 +97,7 @@ class Stat {
         this.expand()
       }
     })
-    document.body.appendChild(this.div)
+    statsLayout.appendChild(this.div)
 
     this.expandButton = document.createElement('div')
     this.expandButton.classList.add('stat-layout-button')
