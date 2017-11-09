@@ -5,11 +5,23 @@ let regexRes = /\/summoner\/([A-Z]+)\/([^\/]+)/.exec(decodeURIComponent(window.l
 
 var region = regexRes[1]
 var summoner = regexRes[2]
+var roleSelect = document.getElementById('role')
+var role = roleSelect.value
+roleSelect.addEventListener('change', e => {
+  role = roleSelect.value
+  farming.updateChart()
+})
 
 document.getElementById('summoner-greeting').innerHTML = summoner
 
+const LEAGUES = ['unranked', 'bronze', 'silver', 'gold', 'platinum', 'diamond', 'master', 'challenger']
+
 const STAT_UNITS = {
   'farming': 'CS/min'
+}
+
+const STATS_NAME = {
+  'farming': 'csmin'
 }
 
 const STAT_ADVICES = {
@@ -21,15 +33,26 @@ const STAT_ADVICES = {
       <li>A close combat minions need two turret's shot and one or two autos, it depends of your attack damage.</li>
       <li>You can use your spells to farm but don't waste all your mana unless you're planning to back.</li>
       <li>When you ant to back wait a wave that precede a cannon wave, push it fast (you can spend all your mana) then back, so if your opponent push the wave under your turret you'll loose less minions because the cannon can tank more shots.</li>
-      <li>Avoid sharing a lane as mush as possible, unless you want to teamfight or prepare an objective the toplaner, the midlaner and the adc should be on different lanes.</li>
+      <li>Avoid sharing a lane as much as possible, unless you want to teamfight or prepare an objective the toplaner, the midlaner and the adc should be on different lanes.</li>
     </ul>
     <b>Exercise idea :</b>
     <ul>
-      <li>Start a game in the sandbox tool, lock your xp to stay level 1, don't buy any item and try to lost the less minions as possible.</li>
+      <li>Start a game in the sandbox tool, lock your xp to stay level 1, don't buy any item and try to last hit as many minions as possible.</li>
       <li>Do an 1v1 against a friend, the winner is the first to reach 100cs, you're not allowed to kill each other.</li>
     </ul>
     `
 }
+
+var statsJson = null
+var xhr = new XMLHttpRequest()
+xhr.onreadystatechange = function () {
+  if (this.readyState == 4 && this.status == 200) {
+    statsJson = JSON.parse(this.responseText)
+    farming.updateChart()
+  }
+}
+xhr.open('GET', '/stats', true)
+xhr.send()
 
 class Stat {
   constructor (name, value, state='avg') {
@@ -46,6 +69,16 @@ class Stat {
       }
     })
     document.body.appendChild(this.div)
+
+    this.expandButton = document.createElement('div')
+    this.expandButton.classList.add('stat-layout-button')
+    this.expandButton.addEventListener('click', e => {
+      if (this.expanded) {
+        e.stopPropagation()
+        this.collapse()
+      }
+    })
+    this.div.appendChild(this.expandButton)
 
     this.statsDiv = document.createElement('div')
     this.statsDiv.classList.add('stat-stats')
@@ -68,25 +101,8 @@ class Stat {
 
     this.rankingDiv = document.createElement('canvas')
     this.rankingDiv.setAttribute('width', 251)
-    this.rankingDiv.setAttribute('height', 150)
+    this.rankingDiv.setAttribute('height', 200)
     this.statsDiv.appendChild(this.rankingDiv)
-    this.rankingChart = new Chart(this.rankingDiv, {
-        type: 'line',
-        data: {
-          labels: ['gold 5', 'gold 4', 'gold 3', 'gold 2', 'gold 1', 'plat 5', 'plat 4'],
-          datasets: [{
-              label: 'Other',
-              backgroundColor: 'rgba(244, 67, 54, 0.2)',
-              borderColor: 'rgb(244, 67, 54)',
-              data: [4.2, 4.8, 5, 5.3, 5.7, 6, 6.8],
-          },{
-              label: 'Yourself',
-              backgroundColor: 'rgba(0, 150, 136, 0.2)',
-              borderColor: 'rgb(0, 150, 136)',
-              data: [this.value, this.value, this.value, this.value, this.value, this.value, this.value],
-          }]
-        }
-    })
 
     this.statAdvices = document.createElement('div')
     this.statAdvices.classList.add('stat-advices')
@@ -103,6 +119,48 @@ class Stat {
     this.expanded = false
     this.div.classList.remove('expanded')
   }
+
+  updateChart () {
+    let labels = []
+    let dataOthers = []
+    let dataYourself = []
+    for (let l = 0; l < LEAGUES.length; l++) {
+      let league = LEAGUES[l]
+      if (league === 'unranked' || league === 'master' || league === 'challenger') {
+        labels.push(league)
+        dataOthers.push(statsJson[role][league][STATS_NAME[this.name]])
+        dataYourself.push(this.value)
+      } else {
+        for (let i = 5; i > 0; i--) {
+          labels.push(league + ' ' + i)
+          dataOthers.push(statsJson[role][league][i][STATS_NAME[this.name]])
+          dataYourself.push(this.value)
+        }
+      }
+    }
+    this.rankingChart = new Chart(this.rankingDiv, {
+        type: 'line',
+        data: {
+          labels: labels,
+          datasets: [{
+              label: 'Others',
+              pointRadius: 0,
+              backgroundColor: 'rgba(244, 67, 54, 0.2)',
+              pointBackgroundColor: 'rgb(244, 67, 54)',
+              borderColor: 'rgb(244, 67, 54)',
+              data: dataOthers,
+          },{
+              label: 'Yourself',
+              pointRadius: 0,
+              backgroundColor: 'rgba(0, 150, 136, 0.2)',
+              pointBackgroundColor: 'rgb(0, 150, 136)',
+              borderColor: 'rgb(0, 150, 136)',
+              data: dataYourself,
+          }]
+        }
+    })
+  }
 }
+
 
 var farming = new Stat('farming', 5.4, 'bad')

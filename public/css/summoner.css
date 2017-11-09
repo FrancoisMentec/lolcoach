@@ -1,11 +1,23 @@
 #greeting {
   font-family: Roboto-Thin;
   font-size: 3em;
+  padding: 8px;
 }
 
 #summoner-greeting {
   font-family: Roboto-Bold;
   color: #F44336;
+}
+
+#role {
+  font-family: Roboto-Bold;
+  color: #F44336;
+  font-size: 1em;
+  height: auto;
+}
+
+#role:hover {
+  background-color: rgba(255,255,255,0.2);
 }
 
 .stat-layout {
@@ -18,23 +30,36 @@
   color: #323232;
   margin: 8px;
   padding-right: 32px;
+  cursor: pointer;
+  box-shadow: 0 4px 5px rgba(0,0,0,0.24);
 }
 
 .stat-layout.expanded {
   height: auto;
+  cursor: default;
 }
 
-.stat-layout::after {
+.stat-layout-button {
+  transition: 0.2s background-color;
   position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
+  top: 8px;
   right: 8px;
-  content: 'expand_more';
   font-family: Material-Icons;
   font-size: 20px;
+  cursor: pointer;
+  border-radius: 50%;
+  background-color: transparent;
 }
 
-.stat-layout.expanded::after {
+.stat-layout-button::after {
+  content: 'expand_more';
+}
+
+.stat-layout-button:hover {
+  background-color: rgba(0,0,0,0.12);
+}
+
+.expanded .stat-layout-button::after {
   content: 'expand_less';
 }
 
@@ -58,6 +83,8 @@
   height: 36px;
   padding: 0 8px 0 8px;
   text-align: center;
+  text-transform: capitalize;
+  font-family: Roboto-Medium;
 }
 
 .expanded .stat-name {
