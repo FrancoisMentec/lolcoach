@@ -154,7 +154,9 @@ function updateAllStats () {
 class Stat {
   constructor (name) {
     this.name = name
-    this.value = statsPlayer[STATS_NAME[this.name]]
+    this.value = typeof statsPlayer[ROLES[role]] !== 'undefined'
+      ? statsPlayer[ROLES[role]][STATS_NAME[this.name]]
+      : NaN
     this.ratio = this.value / statsDivision[ROLES[role]][STATS_NAME[this.name]]
     this.state = this.ratio < 0.95
       ? 'bad'
@@ -222,6 +224,10 @@ class Stat {
   }
 
   update () {
+    this.value = typeof statsPlayer[ROLES[role]] !== 'undefined'
+      ? statsPlayer[ROLES[role]][STATS_NAME[this.name]]
+      : NaN
+    this.statValueDiv.innerHTML = Math.round(this.value * 100) / 100
     this.statValueLayout.classList.remove(this.state)
     this.ratio = this.value / statsDivision[ROLES[role]][STATS_NAME[this.name]]
     this.state = this.ratio < 0.95
