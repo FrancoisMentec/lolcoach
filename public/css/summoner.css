@@ -93,12 +93,28 @@
   background-color: #9C27B0;
 }
 
+@keyframes coach-animation {
+  0% {
+    transform: rotate(0deg);
+  } 25% {
+    transform: rotate(20deg);
+  } 75% {
+    transform: rotate(-20deg);
+  } 100% {
+    transform: rotate(0deg);
+  }
+}
 #coach img {
   display: inline-block;
   width: 70%;
   height: auto;
   margin: 50% 0 0 50%;
   transform: translate(-50%,-50%);
+}
+
+#coach.speaking {
+  animation-name: coach-animation;
+  animation-duration: 2s;
 }
 
 /* stat */

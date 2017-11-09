@@ -123,20 +123,6 @@ async def getMatchData(matchID, region):
 		return getAPIData(url)
 
 def getAverageStatsByAccountID(accountID, region):
-	matchStats = {
-		"cs": []
-		, "KDA": []
-		, "kp": []
-		, "damageDealtToObjectives": []
-		, "damageDealtToTurrets": []
-		, "visionScore": []
-		, "visionWardsBoughtInGame": []
-		, "neutralMinionsKilledTeamJungle": []
-		, "neutralMinionsKilledEnemyJungle": []
-		, "damageDealtToChampions": []
-	}
-
-	averageStats = {}
 
 	matchList = getMatchList(accountID, region, maxGames = 10)
 
@@ -150,24 +136,15 @@ def getAverageStatsByAccountID(accountID, region):
 
 	loop.close()
 
+	playerData = []
+
 	for match in matchInfo:
 
-		#match = getMatchData(matchInfo['gameId'], region)
-		matchKills = {
-			'100': 0
-			, '200': 0
-		}
-		matchDeaths = {
-			'100': 0
-			, '200': 0
-		}
-		matchAssists = {
-			'100': 0
-			, '200': 0
-		}
+		totalKills={100:0,200:0}
+
+		playerRow = {}
+
 		participantID = 0
-		participantData = []
-		participantStats = []
 
 		#print(match['participantIdentities'])
 
@@ -176,21 +153,20 @@ def getAverageStatsByAccountID(accountID, region):
 			if participant['player']['accountId'] == accountID:
 				participantID = participant['participantId']
 				break
-
+		if participantID == 0:
+			continue
 		#print("Participant: " + str(participantID))
 
 		# get the participant's stats
 		# and the kda totals for all participants
 		for participant in match['participants']:
+			totalKills[participant['teamId']] += participant['stats']['kills']
 			if participant['participantId'] == participantID:
-				participantData = participant
 				participantStats = participant['stats']
+				playerRow['position'] = participant['timeline']['lane'] + "_" + participant['timeline']['role']
 
-			matchKills[str(participant['teamId'])] += participant['stats']['kills']
-			matchDeaths[str(participant['teamId'])] += participant['stats']['deaths']
-			matchAssists[str(participant['teamId'])] += participant['stats']['assists']
-
-
+		if not playerRow['position'] in ["JUNGLE_NONE","TOP_SOLO","MIDDLE_SOLO","BOTTOM_DUO_CARRY","BOTTOM_DUO_SUPPORT"]:
+			continue
 		#print(participantStats)
 
 		# KP
@@ -204,35 +180,37 @@ def getAverageStatsByAccountID(accountID, region):
 		# damageTakenPerMinDeltas
 
 		# TODO: check if the stat exists first
-		matchStats["cs"].append(participantStats['totalMinionsKilled'] *60 / match['gameDuration'])
+		playerRow["cs"] = participantStats['totalMinionsKilled'] *60 / match['gameDuration']
 
 		# make sure we don't divide by 0
 		if participantStats['deaths'] > 0:
-			matchStats["KDA"].append((participantStats['kills'] + participantStats['assists']) / participantStats['deaths'])
+			playerRow["KDA"] = (participantStats['kills'] + participantStats['assists']) / participantStats['deaths']
 		else:
-			matchStats["KDA"].append(participantStats['kills'] + participantStats['assists'])
+			playerRow["KDA"] = participantStats['kills'] + participantStats['assists']
 
 		# make sure we don't divide by 0
-		if matchKills[str(participant['teamId'])] > 0:
-			matchStats["kp"].append((participantStats['kills'] + participantStats['assists']) / matchKills[str(participant['teamId'])])
+		if totalKills[participant['teamId']] > 0:
+			playerRow["kp"] = (participantStats['kills'] + participantStats['assists']) / totalKills[participant['teamId']]
 		else:
-			matchStats["kp"].append(0)
+			playerRow["kp"] = 0
 
-		matchStats["damageDealtToObjectives"].append(participantStats['damageDealtToObjectives'])
-		matchStats["damageDealtToTurrets"].append(participantStats['damageDealtToTurrets'])
-		matchStats["visionScore"].append(participantStats['visionScore'])
-		matchStats["visionWardsBoughtInGame"].append(participantStats['visionWardsBoughtInGame'])
-		matchStats["neutralMinionsKilledTeamJungle"].append(participantStats['neutralMinionsKilledTeamJungle'] *60 / match['gameDuration'])
-		matchStats["neutralMinionsKilledEnemyJungle"].append(participantStats['neutralMinionsKilledEnemyJungle'] *60 / match['gameDuration'])
-		matchStats["damageDealtToChampions"].append(participantStats['totalDamageDealtToChampions'])
+		playerRow["objectiveDamage"] = participantStats['damageDealtToObjectives']
+		playerRow["turretDamage"] = participantStats['damageDealtToTurrets']
+		playerRow["visionScore"] = participantStats['visionScore']
+		playerRow["visionWardsBoughtInGame"] = participantStats['visionWardsBoughtInGame']
+		playerRow["neutralMinionsKilledTeamJungle"] = participantStats['neutralMinionsKilledTeamJungle'] *60 / match['gameDuration']
+		playerRow["neutralMinionsKilledEnemyJungle"] = participantStats['neutralMinionsKilledEnemyJungle'] *60 / match['gameDuration']
+		playerRow["totalDamageDealtToChampions"] = participantStats['totalDamageDealtToChampions']
 		#matchStats[""].append(participantStats[''])
+		playerData.append(playerRow)
 
+	df = pd.DataFrame(playerData)
 
-	for statName, statValues in matchStats.items():
-		#print(statName, statValues)
-		averageStats[statName] = mean(statValues)
+	dfSend = df.groupby("position").mean()
+	dfSend['count'] = df.groupby("position").size()
+	return dfSend.T.to_dict()
 
-	return averageStats
+	#return averageStats
 
 def getAllStatsFromSummonerName(summonerName, region):
 	accountID, summonerID = getIDFromSummonerName(summonerName, region)

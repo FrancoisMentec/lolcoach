@@ -285,6 +285,8 @@ class Stat {
 class Coach {
   constructor () {
     this.speakingLayout = document.getElementById('coach-speaking-layout')
+    this.layout = document.getElementById('coach-layout')
+    this.coach = document.getElementById('coach')
   }
 
   say (sentence) {
@@ -292,10 +294,14 @@ class Coach {
     speak.classList.add('coach-speaking')
     speak.innerHTML = sentence
     this.speakingLayout.appendChild(speak)
+    let old = this.coach
+    this.coach = old.cloneNode(true)
+    this.layout.replaceChild(this.coach, old)
   }
 }
 
 var coach = new Coach()
+coach.say('Hello fleshling! I am analyzing your stats, standby.')
 
 updateStatsAverage().then(() => {
   updateStatsPlayer().then(() => {
