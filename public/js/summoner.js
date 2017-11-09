@@ -9,8 +9,7 @@ var roleSelect = document.getElementById('role')
 var role = roleSelect.value
 roleSelect.addEventListener('change', e => {
   role = roleSelect.value
-  farming.update()
-  killParticipation.update()
+  updateAllStats()
 })
 
 document.getElementById('summoner-greeting').innerHTML = summoner
@@ -102,7 +101,15 @@ function updateStatsPlayer () {
 }
 
 // Stats
+var stats = []
 var statsLayout = document.getElementById('stats-layout')
+
+function updateAllStats () {
+  for (let i in stats) {
+    stats[i].update()
+  }
+}
+
 class Stat {
   constructor (name) {
     this.name = name
@@ -153,17 +160,14 @@ class Stat {
     this.statValueLayout.appendChild(this.statValueDiv)
     this.statValueLayout.appendChild(document.createTextNode(' ' + STAT_UNITS[this.name]))
 
-    this.rankingDiv = document.createElement('canvas')
-    this.rankingDiv.setAttribute('width', 251)
-    this.rankingDiv.setAttribute('height', 200)
-    this.statsDiv.appendChild(this.rankingDiv)
-
     this.statAdvices = document.createElement('div')
     this.statAdvices.classList.add('stat-advices')
     this.statAdvices.innerHTML = STAT_ADVICES[this.name]
     this.div.appendChild(this.statAdvices)
 
     this.update()
+
+    stats.push(this)
   }
 
   expand () {
@@ -203,6 +207,15 @@ class Stat {
         }
       }
     }
+
+    if (this.rankingDiv) {
+      this.statsDiv.removeChild(this.rankingDiv)
+    }
+    this.rankingDiv = document.createElement('canvas')
+    this.rankingDiv.setAttribute('width', 251)
+    this.rankingDiv.setAttribute('height', 200)
+    this.statsDiv.appendChild(this.rankingDiv)
+
     this.rankingChart = new Chart(this.rankingDiv, {
         type: 'line',
         data: {
