@@ -84,9 +84,21 @@
 }
 
 #coach {
-  width: calc(100% - 16px);
+  width: 184px;
+  height: 184px;
+  line-height: 184px;
   margin: 8px;
+  box-shadow: 2px 2px 10px rgba(0,0,0,0.24);
+  border-radius: 50%;
+  background-color: #9C27B0;
+}
+
+#coach img {
+  display: inline-block;
+  width: 70%;
   height: auto;
+  margin: 50% 0 0 50%;
+  transform: translate(-50%,-50%);
 }
 
 /* stat */
