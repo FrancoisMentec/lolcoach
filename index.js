@@ -89,6 +89,7 @@ app.get('/stats/:region/:summoner', (req, res) => {
       if (stderr.length > 0) {
         res.send(stderr)
       } else {
+		res.setHeader('Content-Type', 'application/json');
         res.send(stdout)
       }
     }

@@ -20,6 +20,75 @@
   background-color: rgba(255,255,255,0.2);
 }
 
+/* main layout */
+#main-layout {
+  display: flex;
+  width: 100%;
+}
+
+#stats-layout {
+  display: inline-block;
+  width: calc(100% - 200px);
+}
+
+#coach-layout {
+  display: inline-block;
+  width: 200px;
+}
+
+/* coach */
+#coach-speaking-layout {
+  width: 100%;
+}
+
+@keyframes coach-speaking-animation {
+  from {
+    opacity: 0;
+    top: 20px;
+  } to {
+    opacity: 1;
+    top: 0;
+  }
+}
+
+.coach-speaking {
+  position: relative;
+  box-sizing: border-box;
+  width: calc(100% - 16px);
+  margin: 18px 8px 8px 8px;
+  padding: 8px;
+  background-color: white;
+  border-radius: 2px;
+  color: #323232;
+  animation-name: coach-speaking-animation;
+  animation-duration: 1s;
+}
+
+.coach-speaking:first-child {
+  margin-top: 8px;
+}
+
+.coach-speaking::after {
+  content: "";
+  position: absolute;
+  display: inline-block;
+  top: calc(100% - 5px);
+  right: 5px;
+  width: 0;
+  height: 0;
+  border-top: 20px solid white;
+  border-right: 15px solid transparent;
+  border-bottom: 0 solid transparent;
+  transform: rotate(15deg);
+}
+
+#coach {
+  width: calc(100% - 16px);
+  margin: 8px;
+  height: auto;
+}
+
+/* stat */
 .stat-layout {
   box-sizing: border-box;
   position: relative;
