@@ -9,7 +9,7 @@ var fs = require('fs')
 
 // configure app
 var port = 8080
-var python = 'python' // change to python3 if needed
+var python = 'python3' // change to python3 if needed
 app.use(express.static(__dirname + '/public'))
 app.use('/chart.js', express.static(__dirname + '/node_modules/chart.js/dist/Chart.min.js'))
 app.use(bodyParser.json())
