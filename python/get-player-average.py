@@ -10,8 +10,8 @@ except:
 		API_KEY = open("./python/data/API_KEY").read()
 		dataDir = "./python/data/"
 	except:
-		sys.exit("Can't locate API_KEY")	
-		
+		sys.exit("Can't locate API_KEY")
+
 
 region = sys.argv[1].lower()
 player = sys.argv[2]
@@ -59,10 +59,10 @@ def getLeagueBySummonerId(summonerID, region):
 	else:
 		# limit the matches to those that are for Summoner's Rift 5v5 Draft Pick, 5v5 Ranked Solo, 5v5 Blind Pick, and 5v5 Ranked Flex games
 		url = "https://" + region + ".api.riotgames.com/lol/league/v3/positions/by-summoner/" + str(summonerID)
-		
+
 		data = getAPIData(url)
 		league = "UNRANKED"
-		
+
 		if len(data) > 0:
 			for l in data:
 				if l["queueType"] == "RANKED_SOLO_5x5":
@@ -70,7 +70,7 @@ def getLeagueBySummonerId(summonerID, region):
 					break
 				else:
 					league = l['tier'] + "_" + l['rank']
-					
+
 		return league
 
 
@@ -204,32 +204,14 @@ def getAverageStatsByAccountID(accountID, region):
         averageStats[statName] = mean(statValues)
 
     return averageStats
-	
+
 def getAllStatsFromSummonerName(summonerName, region):
 	accountID, summonerID = getIDFromSummonerName(summonerName, region)
 	league = getLeagueBySummonerId(summonerID, region)
-	
+
 	globalStats = getGlobalAverageStats(league)
 	playerStats = getAverageStatsByAccountID(accountID, region)
-	
+
 	print({"global":globalStats,"player":playerStats})
-	
+
 getAllStatsFromSummonerName(player, region)
-#region = "na1"
-
-# accountID = getAccountIDFromSummonerName("Xero Vortex", region)
-# print(accountID)
-#
-# matchList = getMatchList(accountID, region)
-# #print(matchList['matches'][1])
-#
-# match = getMatchData(matchList['matches'][1]['gameId'], region)
-# print(match)
-
-#averageStats = getAverageStatsFromSummonerName("Xero Vortex", region)
-
-#print(averageStats)
-#getGlobalAverageStats("BRONZE_V")
-#print(averageStats)
-
-#print(test)
