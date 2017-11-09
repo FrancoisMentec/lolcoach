@@ -20,25 +20,25 @@ player = sys.argv[2]
 
 #Cache functions
 def isCached(url):
-	if os.path.isfile(cacheDir + hashlib.sha1(url).hexdigest()):
-		if (time.time() - json.loads(open(cacheDir + hashlib.sha1(url).hexdigest()).read())['time']) < 86400:
+	if os.path.isfile(cacheDir + hashlib.sha1(url.encode('utf-8')).hexdigest()):
+		if (time.time() - json.loads(open(cacheDir + hashlib.sha1(url.encode('utf-8')).hexdigest()).read())['time']) < 86400:
 			return True
 	return False
 
 def getCache(url):
-	return json.loads(open(cacheDir + hashlib.sha1(url).hexdigest()).read())['data']
+	return json.loads(open(cacheDir + hashlib.sha1(url.encode('utf-8')).hexdigest()).read())['data']
 
 
 def putCache(url, data):
-	open(cacheDir + hashlib.sha1(url).hexdigest(), 'w').write(json.dumps({"time":time.time(),"data":data}))
+	open(cacheDir + hashlib.sha1(url.encode('utf-8')).hexdigest(), 'w').write(json.dumps({"time":time.time(),"data":data}))
 
 
 def mean(numbers):
-    return float(sum(numbers)) / max(len(numbers), 1)
+	return float(sum(numbers)) / max(len(numbers), 1)
 
 
 def isValidRegion(region):
-    return region in ["br1","eun1","euw1","jp1","kr","la1","la2","na1","oc1","tr1","ru"]
+	return region in ["br1","eun1","euw1","jp1","kr","la1","la2","na1","oc1","tr1","ru"]
 
 def getGlobalAverageStats(rank):
 	df = pd.read_csv(dataDir + 'stats.csv')
@@ -61,23 +61,23 @@ def getAPIData(url):
 
 
 def getIDFromSummonerName(summonerName, region):
-    #https://na1.api.riotgames.com/lol/summoner/v3/summoners/by-name/
+	#https://na1.api.riotgames.com/lol/summoner/v3/summoners/by-name/
 
-    # make sure the region is valid
-    if isValidRegion(region) == False:
-        return "Invalid region"
-    else:
-        url = "https://" + region + ".api.riotgames.com/lol/summoner/v3/summoners/by-name/" + summonerName
+	# make sure the region is valid
+	if isValidRegion(region) == False:
+		return "Invalid region"
+	else:
+		url = "https://" + region + ".api.riotgames.com/lol/summoner/v3/summoners/by-name/" + summonerName
 
-        summonerInfo = getAPIData(url)
+		summonerInfo = getAPIData(url)
 
-        return summonerInfo['accountId'],summonerInfo['id']
+		return summonerInfo['accountId'],summonerInfo['id']
 
 
 def getLeagueBySummonerId(summonerID, region):
-    #https://na1.api.riotgames.com/lol/match/v3/matchlists/by-account/
+	#https://na1.api.riotgames.com/lol/match/v3/matchlists/by-account/
 
-    # make sure the region is valid
+	# make sure the region is valid
 	if isValidRegion(region) == False:
 		return "Invalid region"
 	else:
@@ -99,48 +99,48 @@ def getLeagueBySummonerId(summonerID, region):
 
 
 def getMatchList(accountID, region, maxGames = 100):
-    #https://na1.api.riotgames.com/lol/match/v3/matchlists/by-account/
+	#https://na1.api.riotgames.com/lol/match/v3/matchlists/by-account/
 
-    # make sure the region is valid
-    if isValidRegion(region) == False:
-        return "Invalid region"
-    else:
-        # limit the matches to those that are for Summoner's Rift 5v5 Draft Pick, 5v5 Ranked Solo, 5v5 Blind Pick, and 5v5 Ranked Flex games
-        url = "https://" + region + ".api.riotgames.com/lol/match/v3/matchlists/by-account/" + str(accountID) + "?queue=400&queue=420&queue=430&queue=440&endIndex=" + str(maxGames)
+	# make sure the region is valid
+	if isValidRegion(region) == False:
+		return "Invalid region"
+	else:
+		# limit the matches to those that are for Summoner's Rift 5v5 Draft Pick, 5v5 Ranked Solo, 5v5 Blind Pick, and 5v5 Ranked Flex games
+		url = "https://" + region + ".api.riotgames.com/lol/match/v3/matchlists/by-account/" + str(accountID) + "?queue=400&queue=420&queue=430&queue=440&endIndex=" + str(maxGames)
 
-        return getAPIData(url)
+		return getAPIData(url)
 
 
 def getMatchData(matchID, region):
-    #https://na1.api.riotgames.com/lol/match/v3/matches/
+	#https://na1.api.riotgames.com/lol/match/v3/matches/
 
-    # make sure the region is valid
-    if isValidRegion(region) == False:
-        return "Invalid region"
-    else:
-        url = "https://" + region + ".api.riotgames.com/lol/match/v3/matches/" + str(matchID)
+	# make sure the region is valid
+	if isValidRegion(region) == False:
+		return "Invalid region"
+	else:
+		url = "https://" + region + ".api.riotgames.com/lol/match/v3/matches/" + str(matchID)
 
-        return getAPIData(url)
+		return getAPIData(url)
 
 def getAverageStatsByAccountID(accountID, region):
-    matchStats = {
-        "cs": []
-        , "kda": []
-        , "kp": []
-        , "objectiveDamage": []
-        , "turretDamage": []
-        , "visionScore": []
-        , "visionWardsBoughtInGame": []
-        , "neutralMinionsKilledTeamJungle": []
-        , "neutralMinionsKilledEnemyJungle": []
-        , "totalDamageDealtToChampions": []
-    }
+	matchStats = {
+		"cs": []
+		, "kda": []
+		, "kp": []
+		, "objectiveDamage": []
+		, "turretDamage": []
+		, "visionScore": []
+		, "visionWardsBoughtInGame": []
+		, "neutralMinionsKilledTeamJungle": []
+		, "neutralMinionsKilledEnemyJungle": []
+		, "totalDamageDealtToChampions": []
+	}
 
-    averageStats = {}
+	averageStats = {}
 
-    matchList = getMatchList(accountID, region, maxGames = 10)
+	matchList = getMatchList(accountID, region, maxGames = 10)
 
-    for matchInfo in matchList['matches']:
+	for matchInfo in matchList['matches']:
 
 		match = getMatchData(matchInfo['gameId'], region)
 		matchKills = {
@@ -218,11 +218,11 @@ def getAverageStatsByAccountID(accountID, region):
 		#matchStats[""].append(participantStats[''])
 
 
-    for statName, statValues in matchStats.items():
-        #print(statName, statValues)
-        averageStats[statName] = mean(statValues)
+	for statName, statValues in matchStats.items():
+		#print(statName, statValues)
+		averageStats[statName] = mean(statValues)
 
-    return averageStats
+	return averageStats
 
 def getAllStatsFromSummonerName(summonerName, region):
 	accountID, summonerID = getIDFromSummonerName(summonerName, region)
