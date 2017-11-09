@@ -9,8 +9,7 @@ var roleSelect = document.getElementById('role')
 var role = roleSelect.value
 roleSelect.addEventListener('change', e => {
   role = roleSelect.value
-  farming.updateChart()
-  killParticipation.updateChart()
+  updateAllStats()
 })
 
 document.getElementById('summoner-greeting').innerHTML = summoner
@@ -18,24 +17,31 @@ document.getElementById('summoner-greeting').innerHTML = summoner
 const LEAGUES = ['unranked', 'bronze', 'silver', 'gold', 'platinum', 'diamond', 'master', 'challenger']
 
 const STAT_UNITS = {
-  'farming': 'CS/min',
-  'kill participation': 'KP'
+  'Farming': 'CS/min',
+  'Kill Participation': 'KP',
+  'KDA': 'KDA',
+  'Vision Score': 'Vision Score',
+  'Vision Wards': 'Vision Wards Per Game'
 }
 
+// value should match the json webservice key
 const STATS_NAME = {
-  'farming': 'cs',
-  'kill participation': 'kp'
+  'Farming': 'cs',
+  'Kill Participation': 'kp',
+  'KDA': 'KDA',
+  'Vision Score': 'visionScore',
+  'Vision Wards': 'visionWardsBoughtInGame'
 }
 
 const STAT_ADVICES = {
-  'farming': `
-    <b>Advices :</b>
+  'Farming': `
+    <b>Advice:</b>
     <ul>
-      <li>Wait the last moment to last hit, avoid damaging creeps continiously unless you want to push.</li>
-      <li>A caster minion need one turret's shot and two autos to die, so auto him before he take a shot and last it him after the shot.</li>
-      <li>A close combat minions need two turret's shot and one or two autos, it depends of your attack damage.</li>
+      <li>Wait until the last moment to last hit, avoid damaging minions continiously unless you want to push.</li>
+      <li>A caster minion needs one turret shot and two auto attacks to die, so auto it before it takes a shot and again after.</li>
+      <li>Melee minions need two turret shots and one or two auto attacks, depending on your attack damage.</li>
       <li>You can use your spells to farm but don't waste all your mana unless you're planning to back.</li>
-      <li>When you ant to back wait a wave that precede a cannon wave, push it fast (you can spend all your mana) then back, so if your opponent push the wave under your turret you'll loose less minions because the cannon can tank more shots.</li>
+      <li>When you can't to back wait a wave that precede a cannon wave, push it fast (you can spend all your mana) then back, so if your opponent push the wave under your turret you'll loose less minions because the cannon can tank more shots.</li>
       <li>Avoid sharing a lane as much as possible, unless you want to teamfight or prepare an objective the toplaner, the midlaner and the adc should be on different lanes.</li>
     </ul>
     <b>Exercise idea :</b>
@@ -44,12 +50,30 @@ const STAT_ADVICES = {
       <li>Do an 1v1 against a friend, the winner is the first to reach 100cs, you're not allowed to kill each other.</li>
     </ul>
     `,
-  'kill participation': `
-    <b>Advices :</b>
+  'Kill Participation': `
+    <b>Advice:</b>
     <ul>
       <li>Try to play with your team, it doesn't mean you always have to stay with them, only when they try to take or defend an objective.</li>
     </ul>
-    `
+    `,
+  'KDA': `
+  <b>Advice:</b>
+  <ul>
+    <li>If you have several deaths, start playing safer and closer to turrets.</li>
+  </ul>
+  `,
+  'Vision Score': `
+  <b>Advice:</b>
+  <ul>
+    <li>Wards save lives.</li>
+  </ul>
+  `,
+  'Vision Wards': `
+  <b>Advice:</b>
+  <ul>
+    <li>Vision Wards save lives.</li>
+  </ul>
+  `
 }
 
 var statsAverage = null
@@ -86,14 +110,23 @@ function updateStatsPlayer () {
 }
 
 // Stats
+var stats = []
 var statsLayout = document.getElementById('stats-layout')
+
+function updateAllStats () {
+  for (let i in stats) {
+    stats[i].update()
+  }
+}
+
 class Stat {
   constructor (name) {
     this.name = name
-    this.value = statsPlayer[STATS_NAME[name]]
-    this.state = statsPlayer[STATS_NAME[name]] < 0.95 * statsDivision[STATS_NAME[name]]
+    this.value = statsPlayer[STATS_NAME[this.name]]
+    this.ratio = this.value / statsDivision[STATS_NAME[this.name]]
+    this.state = this.ratio < 0.95
       ? 'bad'
-      : statsPlayer[STATS_NAME[name]] <= 1.05 * statsDivision[STATS_NAME[name]]
+      : this.ratio <= 1.05
         ? 'avg'
         : 'good'
     this.expanded = false
@@ -136,17 +169,14 @@ class Stat {
     this.statValueLayout.appendChild(this.statValueDiv)
     this.statValueLayout.appendChild(document.createTextNode(' ' + STAT_UNITS[this.name]))
 
-    this.rankingDiv = document.createElement('canvas')
-    this.rankingDiv.setAttribute('width', 251)
-    this.rankingDiv.setAttribute('height', 200)
-    this.statsDiv.appendChild(this.rankingDiv)
-
     this.statAdvices = document.createElement('div')
     this.statAdvices.classList.add('stat-advices')
     this.statAdvices.innerHTML = STAT_ADVICES[this.name]
     this.div.appendChild(this.statAdvices)
 
-    this.updateChart()
+    this.update()
+
+    stats.push(this)
   }
 
   expand () {
@@ -159,7 +189,16 @@ class Stat {
     this.div.classList.remove('expanded')
   }
 
-  updateChart () {
+  update () {
+    this.statValueLayout.classList.remove(this.state)
+    this.ratio = this.value / statsDivision[STATS_NAME[this.name]]
+    this.state = this.ratio < 0.95
+      ? 'bad'
+      : this.ratio <= 1.05
+        ? 'avg'
+        : 'good'
+    this.statValueLayout.classList.add(this.state)
+    // update the charts
     let labels = []
     let dataOthers = []
     let dataYourself = []
@@ -177,19 +216,28 @@ class Stat {
         }
       }
     }
+
+    if (this.rankingDiv) {
+      this.statsDiv.removeChild(this.rankingDiv)
+    }
+    this.rankingDiv = document.createElement('canvas')
+    this.rankingDiv.setAttribute('width', 251)
+    this.rankingDiv.setAttribute('height', 200)
+    this.statsDiv.appendChild(this.rankingDiv)
+
     this.rankingChart = new Chart(this.rankingDiv, {
         type: 'line',
         data: {
           labels: labels,
           datasets: [{
               label: 'Others',
-              pointRadius: 0,
+              pointRadius: 2,
               backgroundColor: 'rgba(244, 67, 54, 0.2)',
               pointBackgroundColor: 'rgb(244, 67, 54)',
               borderColor: 'rgb(244, 67, 54)',
               data: dataOthers,
           },{
-              label: 'Yourself',
+              label: 'You',
               pointRadius: 0,
               backgroundColor: 'rgba(0, 150, 136, 0.2)',
               pointBackgroundColor: 'rgb(0, 150, 136)',
@@ -246,8 +294,11 @@ updateStatsAverage().then(() => {
         }]
       }
     })*/
-    farming = new Stat('farming')
-    killParticipation = new Stat('kill participation')
-    coach.say('Clic on a stat to learn how to improve it.')
+    farming = new Stat('Farming');
+    killParticipation = new Stat('Kill Participation');
+    kda = new Stat('KDA');
+    visionScore = new Stat('Vision Score');
+    visionWards = new Stat('Vision Wards');
+    coach.say('Click on a stat to learn how to improve it.');
   })
 })

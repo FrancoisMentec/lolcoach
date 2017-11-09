@@ -125,7 +125,7 @@ async def getMatchData(matchID, region):
 def getAverageStatsByAccountID(accountID, region):
 	matchStats = {
 		"cs": []
-		, "kda": []
+		, "KDA": []
 		, "kp": []
 		, "objectiveDamage": []
 		, "turretDamage": []
@@ -208,9 +208,9 @@ def getAverageStatsByAccountID(accountID, region):
 
 		# make sure we don't divide by 0
 		if participantStats['deaths'] > 0:
-			matchStats["kda"].append((participantStats['kills'] + participantStats['assists']) / participantStats['deaths'])
+			matchStats["KDA"].append((participantStats['kills'] + participantStats['assists']) / participantStats['deaths'])
 		else:
-			matchStats["kda"].append(participantStats['kills'] + participantStats['assists'])
+			matchStats["KDA"].append(participantStats['kills'] + participantStats['assists'])
 
 		# make sure we don't divide by 0
 		if matchKills[str(participant['teamId'])] > 0:
