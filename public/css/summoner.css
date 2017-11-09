@@ -91,6 +91,7 @@
 
 /* stat */
 .stat-layout {
+  transition: 0.2s;
   box-sizing: border-box;
   position: relative;
   display: flex;
@@ -102,6 +103,10 @@
   padding-right: 32px;
   cursor: pointer;
   box-shadow: 0 4px 5px rgba(0,0,0,0.24);
+}
+
+.stat-layout:active {
+  background-color: #CCCCCC;
 }
 
 .stat-layout.expanded {
@@ -165,10 +170,14 @@
 
 .stat-value-layout {
   text-align: center;
+  position: absolute;
+  right: 36px;
 }
 
 .expanded .stat-value-layout {
   width: 100%;
+  position: relative;
+  right: 0;
 }
 
 .stat-value {
