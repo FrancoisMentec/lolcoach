@@ -86,7 +86,7 @@ select:hover, select:active {
   width: 100%;
   text-align: center;
   font-family: Roboto-Thin;
-  font-size: 10em;
+  font-size: 9em;
   text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.5);
 }
 

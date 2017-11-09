@@ -21,20 +21,17 @@ player = sys.argv[2]
 
 #Cache functions
 def isCached(url):
-	if os.path.isfile(cacheDir + hashlib.sha1(url).hexdigest()):
-		if (time.time() - json.loads(open(cacheDir + hashlib.sha1(url).hexdigest()).read())['time']) < 86400:
+	if os.path.isfile(cacheDir + hashlib.sha1(url.encode('utf-8')).hexdigest()):
+		if (time.time() - json.loads(open(cacheDir + hashlib.sha1(url.encode('utf-8')).hexdigest()).read())['time']) < 86400:
 			return True
 	return False
-	
+
 def getCache(url):
-	return json.loads(open(cacheDir + hashlib.sha1(url).hexdigest()).read())['data']
-	
-	
+	return json.loads(open(cacheDir + hashlib.sha1(url.encode('utf-8')).hexdigest()).read())['data']
+
+
 def putCache(url, data):
-	open(cacheDir + hashlib.sha1(url).hexdigest(), 'w').write(json.dumps({"time":time.time(),"data":data}))
-	
-
-
+	open(cacheDir + hashlib.sha1(url.encode('utf-8')).hexdigest(), 'w').write(json.dumps({"time":time.time(),"data":data}))
 
 
 def mean(numbers):
@@ -46,21 +43,21 @@ def isValidRegion(region):
 
 def getGlobalAverageStats(rank):
 	df = pd.read_csv(dataDir + 'stats.csv')
-	return df[df["rank"] == rank].mean().to_dict()
+	return df[df["rank"] == rank].drop('rank', 1).set_index('position').T.to_dict()
 
 def getAPIData(url):
-	
+
 	if isCached(url):
 		return getCache(url)
-	
+
 	#dictionary to hold extra headers
 	HEADERS = {"X-Riot-Token":API_KEY}
 
 	r = requests.get(url, headers=HEADERS);
 	data = r.json()
-	
+
 	putCache(url, data)
-	
+
 	return data;
 
 
@@ -78,7 +75,7 @@ def getIDFromSummonerName(summonerName, region):
 		return summonerInfo['accountId'],summonerInfo['id']
 
 
-async def getLeagueBySummonerId(summonerID, region):
+def getLeagueBySummonerId(summonerID, region):
 	#https://na1.api.riotgames.com/lol/match/v3/matchlists/by-account/
 
 	# make sure the region is valid
@@ -102,7 +99,7 @@ async def getLeagueBySummonerId(summonerID, region):
 		return league
 
 
-async def getMatchList(accountID, region, maxGames = 100):
+def getMatchList(accountID, region, maxGames = 100):
 	#https://na1.api.riotgames.com/lol/match/v3/matchlists/by-account/
 
 	# make sure the region is valid
@@ -113,7 +110,6 @@ async def getMatchList(accountID, region, maxGames = 100):
 		url = "https://" + region + ".api.riotgames.com/lol/match/v3/matchlists/by-account/" + str(accountID) + "?queue=400&queue=420&queue=430&queue=440&endIndex=" + str(maxGames)
 
 		return getAPIData(url)
-
 
 async def getMatchData(matchID, region):
 	#https://na1.api.riotgames.com/lol/match/v3/matches/
@@ -126,7 +122,7 @@ async def getMatchData(matchID, region):
 
 		return getAPIData(url)
 
-async def getAverageStatsByAccountID(accountID, region):
+def getAverageStatsByAccountID(accountID, region):
 	matchStats = {
 		"cs": []
 		, "kda": []
@@ -143,10 +139,20 @@ async def getAverageStatsByAccountID(accountID, region):
 	averageStats = {}
 
 	matchList = getMatchList(accountID, region, maxGames = 10)
+	
+	matchIDs = [ match['gameId'] for match in matchList['matches']]
+	
+	loop = asyncio.get_event_loop()
+	
+	matches = asyncio.gather(*[getMatchData(matchID, region) for matchID in matchIDs])
+	
+	matchInfo = loop.run_until_complete(matches)
 
-	for matchInfo in matchList['matches']:
+	loop.close()
 
-		match = getMatchData(matchInfo['gameId'], region)
+	for match in matchInfo:
+
+		#match = getMatchData(matchInfo['gameId'], region)
 		matchKills = {
 			'100': 0
 			, '200': 0
@@ -232,15 +238,8 @@ def getAllStatsFromSummonerName(summonerName, region):
 	accountID, summonerID = getIDFromSummonerName(summonerName, region)
 	league = getLeagueBySummonerId(summonerID, region)
 	
-	
-	loop = asyncio.get_event_loop()
-	
-	#globalStats = getGlobalAverageStats(league)
-	#playerStats = getAverageStatsByAccountID(accountID, region)
-	
-	tasks = getGlobalAverageStats(league),getAverageStatsByAccountID(accountID, region)
-	
-	globalStats,playerStats = loop.run_until_complete(asyncio.gather(*tasks))
+	globalStats = getGlobalAverageStats(league)
+	playerStats = getAverageStatsByAccountID(accountID, region)
 	
 	print(json.dumps({"global":globalStats,"player":playerStats}))
 
