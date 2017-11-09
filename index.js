@@ -3,6 +3,7 @@ var app = express()
 var http = require('http')
 var server = http.Server(app)
 var bodyParser = require('body-parser')
+var child_process = require('child_process')
 
 var port = 8080
 app.use(express.static(__dirname + '/public'))
@@ -18,6 +19,20 @@ app.get('/', (req, res) => {
 
 app.get('/summoner/*', (req, res) => {
   res.sendFile(__dirname + '/public/html/summoner.html')
+})
+
+app.get('/stats/:region/:summoner', (req, res) => {
+  child_process.exec(`python3 python/script.py ${req.params.region} "${req.params.summoner}"`, (err, stdout, stderr) => {
+    if (error) {
+      console.error(err)
+    } else {
+      if (stderr.length > 0) {
+        res.send(stderr)
+      } else {
+        res.send(stdout)
+      }
+    }
+  })
 })
 
 app.get('*', (req, res) => {

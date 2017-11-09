@@ -14,7 +14,7 @@ const STAT_UNITS = {
 
 const STAT_ADVICES = {
   'farming': `
-    Advice :
+    <b>Advice :</b>
     <ul>
       <li>Wait the last moment to last hit, avoid damaging creeps continiously unless you want to push.</li>
       <li>A caster minion need one turret's shot and two autos to die, so auto him before he take a shot and last it him after the shot.</li>
@@ -23,7 +23,7 @@ const STAT_ADVICES = {
       <li>When you ant to back wait a wave that precede a cannon wave, push it fast (you can spend all your mana) then back, so if your opponent push the wave under your turret you'll loose less minions because the cannon can tank more shots.</li>
       <li>Avoid sharing a lane as mush as possible, unless you want to teamfight or prepare an objective the toplaner, the midlaner and the adc should be on different lanes.</li>
     </ul>
-    Exercise idea :
+    <b>Exercise idea :</b>
     <ul>
       <li>Start a game in the sandbox tool, lock your xp to stay level 1, don't buy any item and try to lost the less minions as possible.</li>
       <li>Do an 1v1 against a friend, the winner is the first to reach 100cs, you're not allowed to kill each other.</li>
