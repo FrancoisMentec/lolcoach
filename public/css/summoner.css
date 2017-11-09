@@ -115,6 +115,7 @@
   padding-right: 32px;
   cursor: pointer;
   box-shadow: 0 4px 5px rgba(0,0,0,0.24);
+  border-radius: 2px;
 }
 
 .stat-layout:active {
