@@ -192,7 +192,7 @@ def getAverageStatsByAccountID(accountID, region):
             # damageTakenPerMinDeltas
 
             # TODO: check if the stat exists first
-            matchStats["cs"].append(participantStats['totalMinionsKilled'])
+            matchStats["cs"].append(participantStats['totalMinionsKilled'] *60 / match['gameDuration'])
 
             # make sure we don't divide by 0
             if participantStats['deaths'] > 0:
@@ -210,8 +210,8 @@ def getAverageStatsByAccountID(accountID, region):
             matchStats["turretDamage"].append(participantStats['damageDealtToTurrets'])
             matchStats["visionScore"].append(participantStats['visionScore'])
             matchStats["visionWardsBoughtInGame"].append(participantStats['visionWardsBoughtInGame'])
-            matchStats["neutralMinionsKilledTeamJungle"].append(participantStats['neutralMinionsKilledTeamJungle'])
-            matchStats["neutralMinionsKilledEnemyJungle"].append(participantStats['neutralMinionsKilledEnemyJungle'])
+            matchStats["neutralMinionsKilledTeamJungle"].append(participantStats['neutralMinionsKilledTeamJungle'] *60 / match['gameDuration'])
+            matchStats["neutralMinionsKilledEnemyJungle"].append(participantStats['neutralMinionsKilledEnemyJungle'] *60 / match['gameDuration'])
             matchStats["totalDamageDealtToChampions"].append(participantStats['totalDamageDealtToChampions'])
             #matchStats[""].append(participantStats[''])
 
