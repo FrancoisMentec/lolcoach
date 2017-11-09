@@ -6,7 +6,7 @@ var server = http.Server(app)
 var bodyParser = require('body-parser')
 var child_process = require('child_process')
 var fs = require('fs')
-//var parse = require('csv-parse/lib/sync')
+var parse = require('csv-parse/lib/sync')
 
 // configure app
 var port = 8080
@@ -17,7 +17,7 @@ app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({
   extended: true
 }))
-/*
+
 // general stats json
 let arr = parse(fs.readFileSync(__dirname + '/python/data/stats.csv'))
 var statsJson = {}
@@ -67,7 +67,7 @@ for (let i = 1; i < arr.length; i++) {
     statsJson[role][league][division] = stats
   }
 }
-*/
+
 // routing
 app.get('/', (req, res) => {
   res.sendFile(__dirname + '/public/html/index.html')

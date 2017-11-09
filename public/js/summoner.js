@@ -23,8 +23,8 @@ const STAT_UNITS = {
 }
 
 const STATS_NAME = {
-  'farming': 'csmin',
-  'kill participation': 'KP'
+  'farming': 'cs',
+  'kill participation': 'kp'
 }
 
 const STAT_ADVICES = {
@@ -68,12 +68,15 @@ function updateStatsAverage () {
 }
 
 var statsPlayer = null
+var statsDivision = null
 function updateStatsPlayer () {
   return new Promise((resolve, reject) => {
     let xhr = new XMLHttpRequest()
     xhr.onreadystatechange = function () {
       if (this.readyState == 4 && this.status == 200) {
-        statsPlayer = JSON.parse(this.responseText.replace(/'/g, '"')).player
+        let res = JSON.parse(this.responseText.replace(/'/g, '"'))
+        statsPlayer = res.player
+        statsDivision = res.global
         resolve()
       }
     }
@@ -88,7 +91,11 @@ class Stat {
   constructor (name) {
     this.name = name
     this.value = statsPlayer[STATS_NAME[name]]
-    this.state = 'bad'
+    this.state = statsPlayer[STATS_NAME[name]] < 0.95 * statsDivision[STATS_NAME[name]]
+      ? 'bad'
+      : statsPlayer[STATS_NAME[name]] <= 1.05 * statsDivision[STATS_NAME[name]]
+        ? 'avg'
+        : 'good'
     this.expanded = false
 
     this.div = document.createElement('div')
@@ -212,6 +219,33 @@ var coach = new Coach()
 
 updateStatsAverage().then(() => {
   updateStatsPlayer().then(() => {
+    /*let labels = []
+    let ystat = []
+    let ostat = []
+    for (let stat in statsPlayer) {
+      labels.push(stat)
+      ystat.push(statsPlayer[stat])
+      ostat.push(statsDivision[stat])
+    }
+    radarChart = new Chart(document.getElementById('radar'), {
+      type: 'radar',
+      data: {
+        labels: labels,
+        datasets: [{
+          label: 'Yourself',
+          backgroundColor: 'rgba(0, 150, 136, 0.2)',
+          pointBackgroundColor: 'rgb(0, 150, 136)',
+          borderColor: 'rgb(0, 150, 136)',
+          data: ystat
+        },{
+          label: 'Others',
+          backgroundColor: 'rgba(244, 67, 54, 0.2)',
+          pointBackgroundColor: 'rgb(244, 67, 54)',
+          borderColor: 'rgb(244, 67, 54)',
+          data: ostat
+        }]
+      }
+    })*/
     farming = new Stat('farming')
     killParticipation = new Stat('kill participation')
     coach.say('Clic on a stat to learn how to improve it.')
