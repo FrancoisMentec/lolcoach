@@ -193,13 +193,13 @@ def getAverageStatsByAccountID(accountID, region):
 		else:
 			playerRow["kp"] = 0
 
-		playerRow["objectiveDamage"] = participantStats['damageDealtToObjectives']
-		playerRow["turretDamage"] = participantStats['damageDealtToTurrets']
+		playerRow["damageDealtToObjectives"] = participantStats['damageDealtToObjectives']
+		playerRow["damageDealtToTurrets"] = participantStats['damageDealtToTurrets']
 		playerRow["visionScore"] = participantStats['visionScore']
 		playerRow["visionWardsBoughtInGame"] = participantStats['visionWardsBoughtInGame']
 		playerRow["neutralMinionsKilledTeamJungle"] = participantStats['neutralMinionsKilledTeamJungle'] *60 / match['gameDuration']
 		playerRow["neutralMinionsKilledEnemyJungle"] = participantStats['neutralMinionsKilledEnemyJungle'] *60 / match['gameDuration']
-		playerRow["totalDamageDealtToChampions"] = participantStats['totalDamageDealtToChampions']
+		playerRow["damageDealtToChampions"] = participantStats['totalDamageDealtToChampions']
 		#matchStats[""].append(participantStats[''])
 		playerData.append(playerRow)
 	
