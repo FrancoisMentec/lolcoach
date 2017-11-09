@@ -1,16 +1,16 @@
 import requests
-import sys, json, os, hashlib
+import sys, json, os, hashlib, time
 import pandas as pd
 
 try:
 	API_KEY = open("./data/API_KEY").read()
 	dataDir = "./data/"
-	cacheDir = "./cache"
+	cacheDir = "./cache/"
 except:
 	try:
 		API_KEY = open("./python/data/API_KEY").read()
 		dataDir = "./python/data/"
-		cacheDir = "./python/cache"
+		cacheDir = "./python/cache/"
 	except:
 		sys.exit("Can't locate API_KEY")
 
@@ -20,14 +20,17 @@ player = sys.argv[2]
 
 #Cache functions
 def isCached(url):
-	return os.path.isfile(hashlib.sha1(url))
+	if os.path.isfile(cacheDir + hashlib.sha1(url).hexdigest()):
+		if (time.time() - json.loads(open(cacheDir + hashlib.sha1(url).hexdigest()).read())['time']) < 86400:
+			return True
+	return False
 	
 def getCache(url):
-	print("hello")
+	return json.loads(open(cacheDir + hashlib.sha1(url).hexdigest()).read())['data']
 	
 	
 def putCache(url, data):
-	print("hello")
+	open(cacheDir + hashlib.sha1(url).hexdigest(), 'w').write(json.dumps({"time":time.time(),"data":data}))
 	
 
 
@@ -46,12 +49,18 @@ def getGlobalAverageStats(rank):
 
 def getAPIData(url):
 	
+	if isCached(url):
+		return getCache(url)
 	
 	#dictionary to hold extra headers
 	HEADERS = {"X-Riot-Token":API_KEY}
 
 	r = requests.get(url, headers=HEADERS);
-	return r.json();
+	data = r.json()
+	
+	putCache(url, data)
+	
+	return data;
 
 
 def getIDFromSummonerName(summonerName, region):
@@ -92,7 +101,7 @@ def getLeagueBySummonerId(summonerID, region):
 		return league
 
 
-def getMatchList(accountID, region):
+def getMatchList(accountID, region, maxGames = 100):
     #https://na1.api.riotgames.com/lol/match/v3/matchlists/by-account/
 
     # make sure the region is valid
@@ -100,7 +109,7 @@ def getMatchList(accountID, region):
         return "Invalid region"
     else:
         # limit the matches to those that are for Summoner's Rift 5v5 Draft Pick, 5v5 Ranked Solo, 5v5 Blind Pick, and 5v5 Ranked Flex games
-        url = "https://" + region + ".api.riotgames.com/lol/match/v3/matchlists/by-account/" + str(accountID) + "?queue=400&queue=420&queue=430&queue=440"
+        url = "https://" + region + ".api.riotgames.com/lol/match/v3/matchlists/by-account/" + str(accountID) + "?queue=400&queue=420&queue=430&queue=440&endIndex=" + str(maxGames)
 
         return getAPIData(url)
 
@@ -132,90 +141,85 @@ def getAverageStatsByAccountID(accountID, region):
 
     averageStats = {}
 
-    matchList = getMatchList(accountID, region)
-
-    matchLimit = 10
-    matchesAnalyzed = 0
+    matchList = getMatchList(accountID, region, maxGames = 10)
 
     for matchInfo in matchList['matches']:
-        if matchesAnalyzed < matchLimit:
 
-            match = getMatchData(matchInfo['gameId'], region)
-            matchKills = {
-                '100': 0
-                , '200': 0
-            }
-            matchDeaths = {
-                '100': 0
-                , '200': 0
-            }
-            matchAssists = {
-                '100': 0
-                , '200': 0
-            }
-            participantID = 0
-            participantData = []
-            participantStats = []
+		match = getMatchData(matchInfo['gameId'], region)
+		matchKills = {
+			'100': 0
+			, '200': 0
+		}
+		matchDeaths = {
+			'100': 0
+			, '200': 0
+		}
+		matchAssists = {
+			'100': 0
+			, '200': 0
+		}
+		participantID = 0
+		participantData = []
+		participantStats = []
 
-            #print(match['participantIdentities'])
+		#print(match['participantIdentities'])
 
-            # get participant ID for given summoner name
-            for participant in match['participantIdentities']:
-                if participant['player']['accountId'] == accountID:
-                    participantID = participant['participantId']
-                    break
+		# get participant ID for given summoner name
+		for participant in match['participantIdentities']:
+			if participant['player']['accountId'] == accountID:
+				participantID = participant['participantId']
+				break
 
-            #print("Participant: " + str(participantID))
+		#print("Participant: " + str(participantID))
 
-            # get the participant's stats
-            # and the kda totals for all participants
-            for participant in match['participants']:
-                if participant['participantId'] == participantID:
-                    participantData = participant
-                    participantStats = participant['stats']
+		# get the participant's stats
+		# and the kda totals for all participants
+		for participant in match['participants']:
+			if participant['participantId'] == participantID:
+				participantData = participant
+				participantStats = participant['stats']
 
-                matchKills[str(participant['teamId'])] += participant['stats']['kills']
-                matchDeaths[str(participant['teamId'])] += participant['stats']['deaths']
-                matchAssists[str(participant['teamId'])] += participant['stats']['assists']
+			matchKills[str(participant['teamId'])] += participant['stats']['kills']
+			matchDeaths[str(participant['teamId'])] += participant['stats']['deaths']
+			matchAssists[str(participant['teamId'])] += participant['stats']['assists']
 
 
-            #print(participantStats)
+		#print(participantStats)
 
-            # KP
-            # Match timeline data
-            # csDiffPerMinDeltas
-            # goldPerMinDeltas
-            # xpDiffPerMinDeltas
-            # creepsPerMinDeltas
-            # xpPerMinDeltas
-            # damageTakenDiffPerMinDeltas
-            # damageTakenPerMinDeltas
+		# KP
+		# Match timeline data
+		# csDiffPerMinDeltas
+		# goldPerMinDeltas
+		# xpDiffPerMinDeltas
+		# creepsPerMinDeltas
+		# xpPerMinDeltas
+		# damageTakenDiffPerMinDeltas
+		# damageTakenPerMinDeltas
 
-            # TODO: check if the stat exists first
-            matchStats["cs"].append(participantStats['totalMinionsKilled'] *60 / match['gameDuration'])
+		# TODO: check if the stat exists first
+		matchStats["cs"].append(participantStats['totalMinionsKilled'] *60 / match['gameDuration'])
 
-            # make sure we don't divide by 0
-            if participantStats['deaths'] > 0:
-                matchStats["kda"].append((participantStats['kills'] + participantStats['assists']) / participantStats['deaths'])
-            else:
-                matchStats["kda"].append(participantStats['kills'] + participantStats['assists'])
+		# make sure we don't divide by 0
+		if participantStats['deaths'] > 0:
+			matchStats["kda"].append((participantStats['kills'] + participantStats['assists']) / participantStats['deaths'])
+		else:
+			matchStats["kda"].append(participantStats['kills'] + participantStats['assists'])
 
-            # make sure we don't divide by 0
-            if matchKills[str(participant['teamId'])] > 0:
-                matchStats["kp"].append((participantStats['kills'] + participantStats['assists']) / matchKills[str(participant['teamId'])])
-            else:
-                matchStats["kp"].append(0)
+		# make sure we don't divide by 0
+		if matchKills[str(participant['teamId'])] > 0:
+			matchStats["kp"].append((participantStats['kills'] + participantStats['assists']) / matchKills[str(participant['teamId'])])
+		else:
+			matchStats["kp"].append(0)
 
-            matchStats["objectiveDamage"].append(participantStats['damageDealtToObjectives'])
-            matchStats["turretDamage"].append(participantStats['damageDealtToTurrets'])
-            matchStats["visionScore"].append(participantStats['visionScore'])
-            matchStats["visionWardsBoughtInGame"].append(participantStats['visionWardsBoughtInGame'])
-            matchStats["neutralMinionsKilledTeamJungle"].append(participantStats['neutralMinionsKilledTeamJungle'] *60 / match['gameDuration'])
-            matchStats["neutralMinionsKilledEnemyJungle"].append(participantStats['neutralMinionsKilledEnemyJungle'] *60 / match['gameDuration'])
-            matchStats["totalDamageDealtToChampions"].append(participantStats['totalDamageDealtToChampions'])
-            #matchStats[""].append(participantStats[''])
+		matchStats["objectiveDamage"].append(participantStats['damageDealtToObjectives'])
+		matchStats["turretDamage"].append(participantStats['damageDealtToTurrets'])
+		matchStats["visionScore"].append(participantStats['visionScore'])
+		matchStats["visionWardsBoughtInGame"].append(participantStats['visionWardsBoughtInGame'])
+		matchStats["neutralMinionsKilledTeamJungle"].append(participantStats['neutralMinionsKilledTeamJungle'] *60 / match['gameDuration'])
+		matchStats["neutralMinionsKilledEnemyJungle"].append(participantStats['neutralMinionsKilledEnemyJungle'] *60 / match['gameDuration'])
+		matchStats["totalDamageDealtToChampions"].append(participantStats['totalDamageDealtToChampions'])
+		#matchStats[""].append(participantStats[''])
 
-            matchesAnalyzed += 1
 
     for statName, statValues in matchStats.items():
         #print(statName, statValues)
