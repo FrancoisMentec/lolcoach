@@ -212,6 +212,6 @@ def getAllStatsFromSummonerName(summonerName, region):
 	globalStats = getGlobalAverageStats(league)
 	playerStats = getAverageStatsByAccountID(accountID, region)
 
-	print({"global":globalStats,"player":playerStats})
+	print({"global":globalStats,"player":playerStats,"league":league})
 
 getAllStatsFromSummonerName(player, region)
