@@ -1,11 +1,14 @@
 import requests
 import sys
+import pandas as pd
 
 try:
 	API_KEY = open("./data/API_KEY").read()
+	dataDir = "./data/"
 except:
 	try:
 		API_KEY = open("./python/data/API_KEY").read()
+		dataDir = "./python/data/"
 	except:
 		sys.exit("Can't locate API_KEY")	
 		
@@ -20,6 +23,9 @@ def mean(numbers):
 def isValidRegion(region):
     return region in ["br1","eun1","euw1","jp1","kr","la1","la2","na1","oc1","tr1","ru"]
 
+def getGlobalAverageStats(rank):
+	df = pd.read_csv(dataDir + 'stats.csv')
+	print(df[df["rank"] == rank].mean().to_dict())
 
 def getAPIData(url):
 	#dictionary to hold extra headers
@@ -190,7 +196,7 @@ region = "na1"
 averageStats = getAverageStatsFromSummonerName("Xero Vortex", region)
 
 #print(averageStats)
-print(getAccountIDFromSummonerName(player,region))
+getGlobalAverageStats("BRONZE_V")
 #print(averageStats)
 
 #print(test)
