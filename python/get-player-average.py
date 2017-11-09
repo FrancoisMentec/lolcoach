@@ -128,7 +128,7 @@ def getAverageStatsByAccountID(accountID, region):
 		, "KDA": []
 		, "kp": []
 		, "damageDealtToObjectives": []
-		, "turretDamage": []
+		, "damageDealtToTurrets": []
 		, "visionScore": []
 		, "visionWardsBoughtInGame": []
 		, "neutralMinionsKilledTeamJungle": []
@@ -219,7 +219,7 @@ def getAverageStatsByAccountID(accountID, region):
 			matchStats["kp"].append(0)
 
 		matchStats["damageDealtToObjectives"].append(participantStats['damageDealtToObjectives'])
-		matchStats["turretDamage"].append(participantStats['damageDealtToTurrets'])
+		matchStats["damageDealtToTurrets"].append(participantStats['damageDealtToTurrets'])
 		matchStats["visionScore"].append(participantStats['visionScore'])
 		matchStats["visionWardsBoughtInGame"].append(participantStats['visionWardsBoughtInGame'])
 		matchStats["neutralMinionsKilledTeamJungle"].append(participantStats['neutralMinionsKilledTeamJungle'] *60 / match['gameDuration'])
