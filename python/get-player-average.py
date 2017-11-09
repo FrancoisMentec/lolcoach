@@ -14,7 +14,8 @@ def isValidRegion(region):
 def getAPIData(url):
 	#dictionary to hold extra headers
 	HEADERS = {"X-Riot-Token":API_KEY}
-	print(url)
+	#print(url)
+
 	r = requests.get(url, headers=HEADERS);
 	return r.json();
 
@@ -40,7 +41,8 @@ def getMatchList(accountID, region):
     if isValidRegion(region) == False:
         return ""
     else:
-        url = "https://" + region + ".api.riotgames.com/lol/match/v3/matchlists/by-account/" + str(accountID)
+        # limit the matches to those that are for Summoner's Rift 5v5 Draft Pick, 5v5 Ranked Solo, 5v5 Blind Pick, and 5v5 Ranked Flex games
+        url = "https://" + region + ".api.riotgames.com/lol/match/v3/matchlists/by-account/" + str(accountID) + "?queue=400&queue=420&queue=430&queue=440"
 
         return getAPIData(url)
 
@@ -57,12 +59,17 @@ def getMatchData(matchID, region):
         return getAPIData(url)
 
 def getAverageStatsFromSummonerName(summonerName, region):
-
     matchStats = {
         "cs": []
         , "kda": []
         #, "kp": []
-        #, "assists": []
+        , "objectiveDamage": []
+        , "turretDamage": []
+        , "visionScore": []
+        , "visionWardsBoughtInGame": []
+        , "neutralMinionsKilledTeamJungle": []
+        , "neutralMinionsKilledEnemyJungle": []
+        , "totalDamageDealtToChampions": []
     }
 
     averageStats = {}
@@ -99,12 +106,7 @@ def getAverageStatsFromSummonerName(summonerName, region):
 
             #print(participantStats)
 
-            # CS
-            # KDA
             # KP
-            # Objective (Dragon, Herald, Turrets, ...)
-            # Damage objective (damageDealtToObjectives)
-            # Damage to buildings (damageDealtToTurrets)
             # Match timeline data
             # csDiffPerMinDeltas
             # goldPerMinDeltas
@@ -113,11 +115,6 @@ def getAverageStatsFromSummonerName(summonerName, region):
             # xpPerMinDeltas
             # damageTakenDiffPerMinDeltas
             # damageTakenPerMinDeltas
-            # visionScore (matches)
-            # visionWardsBoughtInGame (matches)
-            # neutralMinionsKilledTeamJungle
-            # neutralMinionsKilledEnemyJungle
-            # totalDamageDealtToChampions
 
             # TODO: check if the stat exists first
             matchStats["cs"].append(participantStats['totalMinionsKilled'])
@@ -127,9 +124,17 @@ def getAverageStatsFromSummonerName(summonerName, region):
             else:
                 matchStats["kda"].append(participantStats['kills'] + participantStats['assists'])
 
-            #matchStats["kp"].append(participantStats['deaths'])
-            #matchStats["assists"].append(participantStats['assists'])
-            #, "objectiveDamage":
+
+            #, "objectiveDamage": []
+            #, "turretDamage": []
+            matchStats["objectiveDamage"].append(participantStats['damageDealtToObjectives'])
+            matchStats["turretDamage"].append(participantStats['damageDealtToTurrets'])
+            matchStats["visionScore"].append(participantStats['visionScore'])
+            matchStats["visionWardsBoughtInGame"].append(participantStats['visionWardsBoughtInGame'])
+            matchStats["neutralMinionsKilledTeamJungle"].append(participantStats['neutralMinionsKilledTeamJungle'])
+            matchStats["neutralMinionsKilledEnemyJungle"].append(participantStats['neutralMinionsKilledEnemyJungle'])
+            matchStats["totalDamageDealtToChampions"].append(participantStats['totalDamageDealtToChampions'])
+            #matchStats[""].append(participantStats[''])
 
             matchesAnalyzed += 1
 
@@ -139,9 +144,6 @@ def getAverageStatsFromSummonerName(summonerName, region):
         averageStats[statName] = mean(statValues)
 
     return averageStats
-
-#match = getAPIData("https://na1.api.riotgames.com/lol/match/v3/matches/2625251884")
-#print(match)
 
 region = "na1"
 
@@ -158,3 +160,6 @@ region = "na1"
 
 #print(averageStats)
 #print(getAccountIDFromSummonerName("Canisback","euw1"))
+print(averageStats)
+
+#print(test)
