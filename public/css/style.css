@@ -1,4 +1,11 @@
 @font-face {
+  font-family: Material-Icons;
+  font-style: normal;
+  font-weight: 400;
+  src: url(/font/MaterialIcons-Regular.ttf);
+}
+
+@font-face {
     font-family: Roboto-Regular;
     src: url(/font/Roboto-Regular.ttf);
 }
@@ -55,7 +62,7 @@ button {
 }
 
 select {
-  transition: 0.2s;
+  transition: 0.2s background-color;
   height: 36px;
   border-radius: 2px;
   outline: none;

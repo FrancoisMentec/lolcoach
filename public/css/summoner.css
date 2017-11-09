@@ -7,3 +7,97 @@
   font-family: Roboto-Bold;
   color: #F44336;
 }
+
+.stat-layout {
+  box-sizing: border-box;
+  position: relative;
+  display: flex;
+  width: calc(100% - 16px);
+  height: 36px;
+  background-color: white;
+  color: #323232;
+  margin: 8px;
+  padding-right: 32px;
+}
+
+.stat-layout.expanded {
+  height: auto;
+}
+
+.stat-layout::after {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  right: 8px;
+  content: 'expand_more';
+  font-family: Material-Icons;
+  font-size: 20px;
+}
+
+.stat-layout.expanded::after {
+  content: 'expand_less';
+}
+
+.stat-stats {
+  display: inline-block;
+}
+
+.expanded .stat-stats {
+  width: 250px;
+  border-right: 1px solid #EEEEEE;
+}
+
+.stat-stats > div {
+  display: inline-block;
+  height: 36px;
+  line-height: 36px;
+}
+
+.stat-name {
+  box-sizing: border-box;
+  height: 36px;
+  padding: 0 8px 0 8px;
+  text-align: center;
+}
+
+.expanded .stat-name {
+  width: 100%;
+  height: 100px;
+  line-height: 100px;
+}
+
+.stat-value-layout {
+  text-align: center;
+}
+
+.expanded .stat-value-layout {
+  width: 100%;
+}
+
+.stat-value {
+  font-family: Roboto-Medium;
+}
+
+.bad .stat-value {
+  color: #F44336;
+}
+
+.stat-advices {
+  display: none;
+  box-sizing: border-box;
+  width: calc(100% - 251px);
+  padding: 8px;
+  vertical-align: top;
+}
+
+.expanded .stat-advices {
+  display: inline-block;
+}
+
+.stat-layout canvas {
+  display: none !important;
+}
+
+.stat-layout.expanded canvas {
+  display: block !important;
+}

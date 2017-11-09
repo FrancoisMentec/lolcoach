@@ -6,6 +6,7 @@ var bodyParser = require('body-parser')
 
 var port = 8080
 app.use(express.static(__dirname + '/public'))
+app.use('/chart.js', express.static(__dirname + '/node_modules/chart.js/dist/Chart.min.js'))
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({
   extended: true
@@ -24,7 +25,7 @@ app.get('*', (req, res) => {
 })
 
 app.post('/search', (req, res) => {
-  res.redirect('/summoner/' + req.body.server + '/' + req.body.summoner)
+  res.redirect('/summoner/' + req.body.region + '/' + req.body.summoner)
 })
 
 server.listen(port, () => {
