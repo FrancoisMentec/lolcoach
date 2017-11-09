@@ -133,7 +133,7 @@ def getAverageStatsByAccountID(accountID, region):
 		, "visionWardsBoughtInGame": []
 		, "neutralMinionsKilledTeamJungle": []
 		, "neutralMinionsKilledEnemyJungle": []
-		, "totalDamageDealtToChampions": []
+		, "damageDealtToChampions": []
 	}
 
 	averageStats = {}
@@ -224,7 +224,7 @@ def getAverageStatsByAccountID(accountID, region):
 		matchStats["visionWardsBoughtInGame"].append(participantStats['visionWardsBoughtInGame'])
 		matchStats["neutralMinionsKilledTeamJungle"].append(participantStats['neutralMinionsKilledTeamJungle'] *60 / match['gameDuration'])
 		matchStats["neutralMinionsKilledEnemyJungle"].append(participantStats['neutralMinionsKilledEnemyJungle'] *60 / match['gameDuration'])
-		matchStats["totalDamageDealtToChampions"].append(participantStats['totalDamageDealtToChampions'])
+		matchStats["damageDealtToChampions"].append(participantStats['totalDamageDealtToChampions'])
 		#matchStats[""].append(participantStats[''])
 
 

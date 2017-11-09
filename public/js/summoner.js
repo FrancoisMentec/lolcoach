@@ -29,7 +29,8 @@ const STAT_UNITS = {
   'Kill Participation': 'KP',
   'KDA': 'KDA',
   'Vision Score': 'Vision Score',
-  'Vision Wards': 'Vision Wards Per Game'
+  'Vision Wards': 'Vision Wards Per Game',
+  'Damage Dealt to Champions': 'Dmg to Champs'
 }
 
 // value should match the json webservice key
@@ -38,7 +39,8 @@ const STATS_NAME = {
   'Kill Participation': 'kp',
   'KDA': 'KDA',
   'Vision Score': 'visionScore',
-  'Vision Wards': 'visionWardsBoughtInGame'
+  'Vision Wards': 'visionWardsBoughtInGame',
+  'Damage Dealt to Champions': 'damageDealtToChampions'
 }
 
 const STAT_ADVICES = {
@@ -80,6 +82,12 @@ const STAT_ADVICES = {
   <b>Advice:</b>
   <ul>
     <li>Vision Wards save lives.</li>
+  </ul>
+  `,
+  'Damage Dealt to Champions': `
+  <b>Advice:</b>
+  <ul>
+    <li>Do more damage to your opponent than they do to you.</li>
   </ul>
   `
 }
@@ -307,6 +315,7 @@ updateStatsAverage().then(() => {
     kda = new Stat('KDA');
     visionScore = new Stat('Vision Score');
     visionWards = new Stat('Vision Wards');
+    damageDealtToChampions = new Stat('Damage Dealt to Champions');
     coach.say('Click on a stat to learn how to improve it.');
   })
 })
