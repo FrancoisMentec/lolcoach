@@ -25,7 +25,7 @@ def isValidRegion(region):
 
 def getGlobalAverageStats(rank):
 	df = pd.read_csv(dataDir + 'stats.csv')
-	print(df[df["rank"] == rank].mean().to_dict())
+	return df[df["rank"] == rank].mean().to_dict()
 
 def getAPIData(url):
 	#dictionary to hold extra headers
@@ -36,7 +36,7 @@ def getAPIData(url):
 	return r.json();
 
 
-def getAccountIDFromSummonerName(summonerName, region):
+def getIDFromSummonerName(summonerName, region):
     #https://na1.api.riotgames.com/lol/summoner/v3/summoners/by-name/
 
     # make sure the region is valid
@@ -47,7 +47,31 @@ def getAccountIDFromSummonerName(summonerName, region):
 
         summonerInfo = getAPIData(url)
 
-        return summonerInfo['accountId']
+        return summonerInfo['accountId'],summonerInfo['id']
+
+
+def getLeagueBySummonerId(summonerID, region):
+    #https://na1.api.riotgames.com/lol/match/v3/matchlists/by-account/
+
+    # make sure the region is valid
+	if isValidRegion(region) == False:
+		return "Invalid region"
+	else:
+		# limit the matches to those that are for Summoner's Rift 5v5 Draft Pick, 5v5 Ranked Solo, 5v5 Blind Pick, and 5v5 Ranked Flex games
+		url = "https://" + region + ".api.riotgames.com/lol/league/v3/positions/by-summoner/" + str(summonerID)
+		
+		data = getAPIData(url)
+		league = "UNRANKED"
+		
+		if len(data) > 0:
+			for l in data:
+				if l["queueType"] == "RANKED_SOLO_5x5":
+					league = l['tier'] + "_" + l['rank']
+					break
+				else:
+					league = l['tier'] + "_" + l['rank']
+					
+		return league
 
 
 def getMatchList(accountID, region):
@@ -74,7 +98,7 @@ def getMatchData(matchID, region):
 
         return getAPIData(url)
 
-def getAverageStatsFromSummonerName(summonerName, region):
+def getAverageStatsByAccountID(accountID, region):
     matchStats = {
         "cs": []
         , "kda": []
@@ -90,7 +114,6 @@ def getAverageStatsFromSummonerName(summonerName, region):
 
     averageStats = {}
 
-    accountID = getAccountIDFromSummonerName(summonerName, region)
     matchList = getMatchList(accountID, region)
 
     matchLimit = 10
@@ -181,8 +204,18 @@ def getAverageStatsFromSummonerName(summonerName, region):
         averageStats[statName] = mean(statValues)
 
     return averageStats
-
-region = "na1"
+	
+def getAllStatsFromSummonerName(summonerName, region):
+	accountID, summonerID = getIDFromSummonerName(summonerName, region)
+	league = getLeagueBySummonerId(summonerID, region)
+	
+	globalStats = getGlobalAverageStats(league)
+	playerStats = getAverageStatsByAccountID(accountID, region)
+	
+	print({"global":globalStats,"player":playerStats})
+	
+getAllStatsFromSummonerName(player, region)
+#region = "na1"
 
 # accountID = getAccountIDFromSummonerName("Xero Vortex", region)
 # print(accountID)
@@ -193,10 +226,10 @@ region = "na1"
 # match = getMatchData(matchList['matches'][1]['gameId'], region)
 # print(match)
 
-averageStats = getAverageStatsFromSummonerName("Xero Vortex", region)
+#averageStats = getAverageStatsFromSummonerName("Xero Vortex", region)
 
 #print(averageStats)
-getGlobalAverageStats("BRONZE_V")
+#getGlobalAverageStats("BRONZE_V")
 #print(averageStats)
 
 #print(test)
