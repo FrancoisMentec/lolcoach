@@ -4,7 +4,8 @@
   "description": "A coaching website for League of Legends made during the riot hackathon 2017.",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+	"start": "node index.js"
   },
   "repository": {
     "type": "git",
