@@ -123,6 +123,7 @@ async def getMatchData(matchID, region):
 		return getAPIData(url)
 
 def getAverageStatsByAccountID(accountID, region):
+
 	matchList = getMatchList(accountID, region, maxGames = 10)
 
 	matchIDs = [ match['gameId'] for match in matchList['matches']]
@@ -134,15 +135,15 @@ def getAverageStatsByAccountID(accountID, region):
 	matchInfo = loop.run_until_complete(matches)
 
 	loop.close()
-	
+
 	playerData = []
 
 	for match in matchInfo:
-	
+
 		totalKills={100:0,200:0}
-		
+
 		playerRow = {}
-		
+
 		participantID = 0
 
 		#print(match['participantIdentities'])
@@ -202,13 +203,13 @@ def getAverageStatsByAccountID(accountID, region):
 		playerRow["damageDealtToChampions"] = participantStats['totalDamageDealtToChampions']
 		#matchStats[""].append(participantStats[''])
 		playerData.append(playerRow)
-	
+
 	df = pd.DataFrame(playerData)
-	
+
 	dfSend = df.groupby("position").mean()
 	dfSend['count'] = df.groupby("position").size()
 	return dfSend.T.to_dict()
-	
+
 	#return averageStats
 
 def getAllStatsFromSummonerName(summonerName, region):

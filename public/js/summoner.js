@@ -31,7 +31,8 @@ const STAT_UNITS = {
   'Vision Score': 'Vision Score',
   'Vision Wards': 'Vision Wards Per Game',
   'Damage Dealt to Champions': 'Dmg to Champs',
-  'Damage Dealt to Objectives': 'Dmg to Objectives'
+  'Damage Dealt to Objectives': 'Dmg to Objectives',
+  'Damage Dealt to Turrets': 'Dmg to Turrets'
 }
 
 // value should match the json webservice key
@@ -42,7 +43,8 @@ const STATS_NAME = {
   'Vision Score': 'visionScore',
   'Vision Wards': 'visionWardsBoughtInGame',
   'Damage Dealt to Champions': 'damageDealtToChampions',
-  'Damage Dealt to Objectives': 'damageDealtToObjectives'
+  'Damage Dealt to Objectives': 'damageDealtToObjectives',
+  'Damage Dealt to Turrets': 'damageDealtToTurrets'
 }
 
 const STAT_ADVICES = {
@@ -97,7 +99,13 @@ const STAT_ADVICES = {
   <ul>
     <li>Taking objectives is a good way to gain an advantage over the enemy team.</li>
   </ul>
-  `//'Damage Dealt to Objectives'
+  `,
+  'Damage Dealt to Turrets': `
+  <b>Advice:</b>
+  <ul>
+    <li>Destroying turrets is a good way to gain an advantage over the enemy team.</li>
+  </ul>
+  `//Damage Dealt to Turrets
 }
 
 var statsAverage = null
@@ -331,6 +339,7 @@ updateStatsAverage().then(() => {
     visionWards = new Stat('Vision Wards');
     damageDealtToChampions = new Stat('Damage Dealt to Champions');
     damageDealtToObjectives = new Stat('Damage Dealt to Objectives');
+    damageDealtToTurrets = new Stat('Damage Dealt to Turrets');
     coach.say('Click on a stat to learn how to improve it.');
   })
 })
