@@ -62,7 +62,7 @@ def getAverageStatsFromSummonerName(summonerName, region):
     matchStats = {
         "cs": []
         , "kda": []
-        #, "kp": []
+        , "kp": []
         , "objectiveDamage": []
         , "turretDamage": []
         , "visionScore": []
@@ -84,7 +84,20 @@ def getAverageStatsFromSummonerName(summonerName, region):
         if matchesAnalyzed < matchLimit:
 
             match = getMatchData(matchInfo['gameId'], region)
+            matchKills = {
+                '100': 0
+                , '200': 0
+            }
+            matchDeaths = {
+                '100': 0
+                , '200': 0
+            }
+            matchAssists = {
+                '100': 0
+                , '200': 0
+            }
             participantID = 0
+            participantData = []
             participantStats = []
 
             #print(match['participantIdentities'])
@@ -98,10 +111,15 @@ def getAverageStatsFromSummonerName(summonerName, region):
             #print("Participant: " + str(participantID))
 
             # get the participant's stats
+            # and the kda totals for all participants
             for participant in match['participants']:
                 if participant['participantId'] == participantID:
+                    participantData = participant
                     participantStats = participant['stats']
-                    break
+
+                matchKills[str(participant['teamId'])] += participant['stats']['kills']
+                matchDeaths[str(participant['teamId'])] += participant['stats']['deaths']
+                matchAssists[str(participant['teamId'])] += participant['stats']['assists']
 
 
             #print(participantStats)
@@ -118,15 +136,19 @@ def getAverageStatsFromSummonerName(summonerName, region):
 
             # TODO: check if the stat exists first
             matchStats["cs"].append(participantStats['totalMinionsKilled'])
+
             # make sure we don't divide by 0
             if participantStats['deaths'] > 0:
                 matchStats["kda"].append((participantStats['kills'] + participantStats['assists']) / participantStats['deaths'])
             else:
                 matchStats["kda"].append(participantStats['kills'] + participantStats['assists'])
 
+            # make sure we don't divide by 0
+            if matchKills[str(participant['teamId'])] > 0:
+                matchStats["kp"].append((participantStats['kills'] + participantStats['assists']) / matchKills[str(participant['teamId'])])
+            else:
+                matchStats["kp"].append(0)
 
-            #, "objectiveDamage": []
-            #, "turretDamage": []
             matchStats["objectiveDamage"].append(participantStats['damageDealtToObjectives'])
             matchStats["turretDamage"].append(participantStats['damageDealtToTurrets'])
             matchStats["visionScore"].append(participantStats['visionScore'])
@@ -140,7 +162,6 @@ def getAverageStatsFromSummonerName(summonerName, region):
 
     for statName, statValues in matchStats.items():
         #print(statName, statValues)
-
         averageStats[statName] = mean(statValues)
 
     return averageStats
@@ -156,7 +177,7 @@ region = "na1"
 # match = getMatchData(matchList['matches'][1]['gameId'], region)
 # print(match)
 
-#averageStats = getAverageStatsFromSummonerName("Xero Vortex", region)
+averageStats = getAverageStatsFromSummonerName("Xero Vortex", region)
 
 #print(averageStats)
 #print(getAccountIDFromSummonerName("Canisback","euw1"))
