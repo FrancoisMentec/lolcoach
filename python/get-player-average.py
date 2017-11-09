@@ -1,5 +1,7 @@
 import requests
 
+API_KEY = open("./data/API_KEY").read()
+
 def mean(numbers):
     return float(sum(numbers)) / max(len(numbers), 1)
 
@@ -11,8 +13,8 @@ def isValidRegion(region):
 
 def getAPIData(url):
 	#dictionary to hold extra headers
-	HEADERS = {"X-Riot-Token":''}
-
+	HEADERS = {"X-Riot-Token":API_KEY}
+	print(url)
 	r = requests.get(url, headers=HEADERS);
 	return r.json();
 
@@ -100,7 +102,7 @@ def getAverageStatsFromSummonerName(summonerName, region):
             # CS
             # KDA
             # KP
-            # Objective (Dragon, Herald, Turrets, …)
+            # Objective (Dragon, Herald, Turrets, ...)
             # Damage objective (damageDealtToObjectives)
             # Damage to buildings (damageDealtToTurrets)
             # Match timeline data
@@ -152,6 +154,7 @@ region = "na1"
 # match = getMatchData(matchList['matches'][1]['gameId'], region)
 # print(match)
 
-averageStats = getAverageStatsFromSummonerName("Xero Vortex", region)
+#averageStats = getAverageStatsFromSummonerName("Xero Vortex", region)
 
 #print(averageStats)
+#print(getAccountIDFromSummonerName("Canisback","euw1"))
