@@ -178,6 +178,14 @@
   color: #F44336;
 }
 
+.avg .stat-value {
+  color: #BDBDBD;
+}
+
+.good .stat-value {
+  color: #4CAF50;
+}
+
 .stat-advices {
   display: none;
   box-sizing: border-box;
