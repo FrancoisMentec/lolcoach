@@ -1,20 +1,37 @@
 import requests
-import sys
+import sys, json, os, hashlib
 import pandas as pd
 
 try:
 	API_KEY = open("./data/API_KEY").read()
 	dataDir = "./data/"
+	cacheDir = "./cache"
 except:
 	try:
 		API_KEY = open("./python/data/API_KEY").read()
 		dataDir = "./python/data/"
+		cacheDir = "./python/cache"
 	except:
 		sys.exit("Can't locate API_KEY")	
 		
 
 region = sys.argv[1].lower()
 player = sys.argv[2]
+
+#Cache functions
+def isCached(url):
+	return os.path.isfile(hashlib.sha1(url))
+	
+def getCache(url):
+	print("hello")
+	
+	
+def putCache(url, data):
+	print("hello")
+	
+
+
+
 
 def mean(numbers):
     return float(sum(numbers)) / max(len(numbers), 1)
@@ -28,9 +45,10 @@ def getGlobalAverageStats(rank):
 	return df[df["rank"] == rank].mean().to_dict()
 
 def getAPIData(url):
+	
+	
 	#dictionary to hold extra headers
 	HEADERS = {"X-Riot-Token":API_KEY}
-	#print(url)
 
 	r = requests.get(url, headers=HEADERS);
 	return r.json();
@@ -212,7 +230,7 @@ def getAllStatsFromSummonerName(summonerName, region):
 	globalStats = getGlobalAverageStats(league)
 	playerStats = getAverageStatsByAccountID(accountID, region)
 	
-	print({"global":globalStats,"player":playerStats})
+	print(json.dumps({"global":globalStats,"player":playerStats}))
 	
 getAllStatsFromSummonerName(player, region)
 #region = "na1"
