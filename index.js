@@ -22,8 +22,8 @@ app.get('/summoner/*', (req, res) => {
 })
 
 app.get('/stats/:region/:summoner', (req, res) => {
-  child_process.exec(`python3 python/script.py ${req.params.region} "${req.params.summoner}"`, (err, stdout, stderr) => {
-    if (error) {
+  child_process.exec(`python3 python/get-player-average.py ${req.params.region} "${req.params.summoner}"`, (err, stdout, stderr) => {
+    if (err) {
       console.error(err)
     } else {
       if (stderr.length > 0) {

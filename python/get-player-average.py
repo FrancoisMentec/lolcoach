@@ -1,14 +1,24 @@
 import requests
+import sys
 
-API_KEY = open("./data/API_KEY").read()
+try:
+	API_KEY = open("./data/API_KEY").read()
+except:
+	try:
+		API_KEY = open("./python/data/API_KEY").read()
+	except:
+		sys.exit("Can't locate API_KEY")	
+		
+
+region = sys.argv[1].lower()
+player = sys.argv[2]
 
 def mean(numbers):
     return float(sum(numbers)) / max(len(numbers), 1)
 
 
 def isValidRegion(region):
-    # TODO: fill this in
-    return True
+    return region in ["br1","eun1","euw1","jp1","kr","la1","la2","na1","oc1","tr1","ru"]
 
 
 def getAPIData(url):
@@ -25,7 +35,7 @@ def getAccountIDFromSummonerName(summonerName, region):
 
     # make sure the region is valid
     if isValidRegion(region) == False:
-        return ""
+        return "Invalid region"
     else:
         url = "https://" + region + ".api.riotgames.com/lol/summoner/v3/summoners/by-name/" + summonerName
 
@@ -39,7 +49,7 @@ def getMatchList(accountID, region):
 
     # make sure the region is valid
     if isValidRegion(region) == False:
-        return ""
+        return "Invalid region"
     else:
         # limit the matches to those that are for Summoner's Rift 5v5 Draft Pick, 5v5 Ranked Solo, 5v5 Blind Pick, and 5v5 Ranked Flex games
         url = "https://" + region + ".api.riotgames.com/lol/match/v3/matchlists/by-account/" + str(accountID) + "?queue=400&queue=420&queue=430&queue=440"
@@ -52,7 +62,7 @@ def getMatchData(matchID, region):
 
     # make sure the region is valid
     if isValidRegion(region) == False:
-        return ""
+        return "Invalid region"
     else:
         url = "https://" + region + ".api.riotgames.com/lol/match/v3/matches/" + str(matchID)
 
@@ -159,7 +169,7 @@ region = "na1"
 #averageStats = getAverageStatsFromSummonerName("Xero Vortex", region)
 
 #print(averageStats)
-#print(getAccountIDFromSummonerName("Canisback","euw1"))
-print(averageStats)
+print(getAccountIDFromSummonerName(player,region))
+#print(averageStats)
 
 #print(test)
