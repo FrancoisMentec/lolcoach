@@ -20,14 +20,17 @@ const STAT_UNITS = {
   'Farming': 'CS/min',
   'Kill Participation': 'KP',
   'KDA': 'KDA',
-  'vision Score': 'Vision Score'
+  'Vision Score': 'Vision Score',
+  'Vision Wards': 'Vision Wards Per Game'
 }
 
+// value should match the json webservice key
 const STATS_NAME = {
   'Farming': 'cs',
   'Kill Participation': 'kp',
   'KDA': 'KDA',
-  'vision Score': 'visionScore'
+  'Vision Score': 'visionScore',
+  'Vision Wards': 'visionWardsBoughtInGame'
 }
 
 const STAT_ADVICES = {
@@ -59,10 +62,16 @@ const STAT_ADVICES = {
     <li>If you have several deaths, start playing safer and closer to turrets.</li>
   </ul>
   `,
-  'vision Score': `
+  'Vision Score': `
   <b>Advice:</b>
   <ul>
     <li>Wards save lives.</li>
+  </ul>
+  `,
+  'Vision Wards': `
+  <b>Advice:</b>
+  <ul>
+    <li>Vision Wards save lives.</li>
   </ul>
   `
 }
@@ -288,7 +297,8 @@ updateStatsAverage().then(() => {
     farming = new Stat('Farming');
     killParticipation = new Stat('Kill Participation');
     kda = new Stat('KDA');
-    visionScore = new Stat('vision Score');
+    visionScore = new Stat('Vision Score');
+    visionWards = new Stat('Vision Wards');
     coach.say('Click on a stat to learn how to improve it.');
   })
 })
