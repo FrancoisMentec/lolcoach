@@ -1,7 +1,7 @@
 /**
  * The code for the summoner page
  */
-let regexRes = /\/summoner\/([A-Z]+)\/([^\/]+)/.exec(decodeURIComponent(window.location.pathname))
+let regexRes = /\/summoner\/([A-Z0-9]+)\/([^\/]+)/.exec(decodeURIComponent(window.location.pathname))
 
 var region = regexRes[1]
 var summoner = regexRes[2]
@@ -82,6 +82,7 @@ function updateStatsPlayer () {
   })
 }
 
+// Stats
 var statsLayout = document.getElementById('stats-layout')
 class Stat {
   constructor (name) {
@@ -193,9 +194,26 @@ class Stat {
   }
 }
 
+// Coach
+class Coach {
+  constructor () {
+    this.speakingLayout = document.getElementById('coach-speaking-layout')
+  }
+
+  say (sentence) {
+    let speak = document.createElement('div')
+    speak.classList.add('coach-speaking')
+    speak.innerHTML = sentence
+    this.speakingLayout.appendChild(speak)
+  }
+}
+
+var coach = new Coach()
+
 updateStatsAverage().then(() => {
   updateStatsPlayer().then(() => {
     farming = new Stat('farming')
     killParticipation = new Stat('kill participation')
+    coach.say('Clic on a stat to learn how to improve it.')
   })
 })

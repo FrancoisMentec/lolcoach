@@ -41,15 +41,31 @@
   width: 100%;
 }
 
+@keyframes coach-speaking-animation {
+  from {
+    opacity: 0;
+    top: 20px;
+  } to {
+    opacity: 1;
+    top: 0;
+  }
+}
+
 .coach-speaking {
   position: relative;
   box-sizing: border-box;
   width: calc(100% - 16px);
-  margin: 8px;
+  margin: 18px 8px 8px 8px;
   padding: 8px;
   background-color: white;
   border-radius: 2px;
   color: #323232;
+  animation-name: coach-speaking-animation;
+  animation-duration: 1s;
+}
+
+.coach-speaking:first-child {
+  margin-top: 8px;
 }
 
 .coach-speaking::after {
