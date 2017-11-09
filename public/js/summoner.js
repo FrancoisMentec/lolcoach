@@ -10,6 +10,7 @@ var role = roleSelect.value
 roleSelect.addEventListener('change', e => {
   role = roleSelect.value
   farming.updateChart()
+  killParticipation.updateChart()
 })
 
 document.getElementById('summoner-greeting').innerHTML = summoner
@@ -17,16 +18,18 @@ document.getElementById('summoner-greeting').innerHTML = summoner
 const LEAGUES = ['unranked', 'bronze', 'silver', 'gold', 'platinum', 'diamond', 'master', 'challenger']
 
 const STAT_UNITS = {
-  'farming': 'CS/min'
+  'farming': 'CS/min',
+  'kill participation': 'KP'
 }
 
 const STATS_NAME = {
-  'farming': 'csmin'
+  'farming': 'csmin',
+  'kill participation': 'KP'
 }
 
 const STAT_ADVICES = {
   'farming': `
-    <b>Advice :</b>
+    <b>Advices :</b>
     <ul>
       <li>Wait the last moment to last hit, avoid damaging creeps continiously unless you want to push.</li>
       <li>A caster minion need one turret's shot and two autos to die, so auto him before he take a shot and last it him after the shot.</li>
@@ -40,25 +43,51 @@ const STAT_ADVICES = {
       <li>Start a game in the sandbox tool, lock your xp to stay level 1, don't buy any item and try to last hit as many minions as possible.</li>
       <li>Do an 1v1 against a friend, the winner is the first to reach 100cs, you're not allowed to kill each other.</li>
     </ul>
+    `,
+  'kill participation': `
+    <b>Advices :</b>
+    <ul>
+      <li>Try to play with your team, it doesn't mean you always have to stay with them, only when they try to take or defend an objective.</li>
+    </ul>
     `
 }
 
-var statsJson = null
-var xhr = new XMLHttpRequest()
-xhr.onreadystatechange = function () {
-  if (this.readyState == 4 && this.status == 200) {
-    statsJson = JSON.parse(this.responseText)
-    farming.updateChart()
-  }
+var statsAverage = null
+function updateStatsAverage () {
+  return new Promise((resolve, reject) => {
+    let xhr = new XMLHttpRequest()
+    xhr.onreadystatechange = function () {
+      if (this.readyState == 4 && this.status == 200) {
+        statsAverage = JSON.parse(this.responseText)
+        resolve()
+      }
+    }
+    xhr.open('GET', '/stats', true)
+    xhr.send()
+  })
 }
-xhr.open('GET', '/stats', true)
-xhr.send()
+
+var statsPlayer = null
+function updateStatsPlayer () {
+  return new Promise((resolve, reject) => {
+    let xhr = new XMLHttpRequest()
+    xhr.onreadystatechange = function () {
+      if (this.readyState == 4 && this.status == 200) {
+        statsPlayer = JSON.parse(this.responseText.replace(/'/g, '"'))
+        resolve()
+      }
+    }
+    xhr.open('GET', `/stats/${region}/${summoner}`, true)
+    xhr.send()
+  })
+}
+
 
 class Stat {
-  constructor (name, value, state='avg') {
+  constructor (name) {
     this.name = name
-    this.value = value
-    this.state = state
+    this.value = statsPlayer[STATS_NAME[name]]
+    this.state = 'bad'
     this.expanded = false
 
     this.div = document.createElement('div')
@@ -95,7 +124,7 @@ class Stat {
     this.statsDiv.appendChild(this.statValueLayout)
     this.statValueDiv = document.createElement('span')
     this.statValueDiv.classList.add('stat-value')
-    this.statValueDiv.innerHTML = this.value
+    this.statValueDiv.innerHTML = Math.round(this.value * 100) / 100
     this.statValueLayout.appendChild(this.statValueDiv)
     this.statValueLayout.appendChild(document.createTextNode(' ' + STAT_UNITS[this.name]))
 
@@ -108,6 +137,8 @@ class Stat {
     this.statAdvices.classList.add('stat-advices')
     this.statAdvices.innerHTML = STAT_ADVICES[this.name]
     this.div.appendChild(this.statAdvices)
+
+    this.updateChart()
   }
 
   expand () {
@@ -128,12 +159,12 @@ class Stat {
       let league = LEAGUES[l]
       if (league === 'unranked' || league === 'master' || league === 'challenger') {
         labels.push(league)
-        dataOthers.push(statsJson[role][league][STATS_NAME[this.name]])
+        dataOthers.push(statsAverage[role][league][STATS_NAME[this.name]])
         dataYourself.push(this.value)
       } else {
         for (let i = 5; i > 0; i--) {
           labels.push(league + ' ' + i)
-          dataOthers.push(statsJson[role][league][i][STATS_NAME[this.name]])
+          dataOthers.push(statsAverage[role][league][i][STATS_NAME[this.name]])
           dataYourself.push(this.value)
         }
       }
@@ -162,5 +193,9 @@ class Stat {
   }
 }
 
-
-var farming = new Stat('farming', 5.4, 'bad')
+updateStatsAverage().then(() => {
+  updateStatsPlayer().then(() => {
+    farming = new Stat('farming')
+    killParticipation = new Stat('kill participation')
+  })
+})
