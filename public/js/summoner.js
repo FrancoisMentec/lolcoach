@@ -16,6 +16,14 @@ document.getElementById('summoner-greeting').innerHTML = summoner
 
 const LEAGUES = ['unranked', 'bronze', 'silver', 'gold', 'platinum', 'diamond', 'master', 'challenger']
 
+const ROLES = {
+  'top': 'TOP_SOLO',
+  'jungle': 'JUNGLE_NONE',
+  'mid': 'MIDDLE_SOLO',
+  'adc': 'BOTTOM_DUO_CARRY',
+  'support': 'BOTTOM_DUO_SUPPORT'
+}
+
 const STAT_UNITS = {
   'Farming': 'CS/min',
   'Kill Participation': 'KP',
@@ -123,7 +131,7 @@ class Stat {
   constructor (name) {
     this.name = name
     this.value = statsPlayer[STATS_NAME[this.name]]
-    this.ratio = this.value / statsDivision[STATS_NAME[this.name]]
+    this.ratio = this.value / statsDivision[ROLES[role]][STATS_NAME[this.name]]
     this.state = this.ratio < 0.95
       ? 'bad'
       : this.ratio <= 1.05
@@ -191,7 +199,7 @@ class Stat {
 
   update () {
     this.statValueLayout.classList.remove(this.state)
-    this.ratio = this.value / statsDivision[STATS_NAME[this.name]]
+    this.ratio = this.value / statsDivision[ROLES[role]][STATS_NAME[this.name]]
     this.state = this.ratio < 0.95
       ? 'bad'
       : this.ratio <= 1.05
