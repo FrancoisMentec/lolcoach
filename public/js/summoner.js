@@ -16,12 +16,22 @@ document.getElementById('summoner-greeting').innerHTML = summoner
 
 const LEAGUES = ['unranked', 'bronze', 'silver', 'gold', 'platinum', 'diamond', 'master', 'challenger']
 
+const ROLES = {
+  'top': 'TOP_SOLO',
+  'jungle': 'JUNGLE_NONE',
+  'mid': 'MIDDLE_SOLO',
+  'adc': 'BOTTOM_DUO_CARRY',
+  'support': 'BOTTOM_DUO_SUPPORT'
+}
+
 const STAT_UNITS = {
   'Farming': 'CS/min',
   'Kill Participation': 'KP',
   'KDA': 'KDA',
   'Vision Score': 'Vision Score',
-  'Vision Wards': 'Vision Wards Per Game'
+  'Vision Wards': 'Vision Wards Per Game',
+  'Damage Dealt to Champions': 'Dmg to Champs',
+  'Damage Dealt to Objectives': 'Dmg to Objectives'
 }
 
 // value should match the json webservice key
@@ -30,7 +40,9 @@ const STATS_NAME = {
   'Kill Participation': 'kp',
   'KDA': 'KDA',
   'Vision Score': 'visionScore',
-  'Vision Wards': 'visionWardsBoughtInGame'
+  'Vision Wards': 'visionWardsBoughtInGame',
+  'Damage Dealt to Champions': 'damageDealtToChampions',
+  'Damage Dealt to Objectives': 'damageDealtToObjectives'
 }
 
 const STAT_ADVICES = {
@@ -73,7 +85,19 @@ const STAT_ADVICES = {
   <ul>
     <li>Vision Wards save lives.</li>
   </ul>
-  `
+  `,
+  'Damage Dealt to Champions': `
+  <b>Advice:</b>
+  <ul>
+    <li>Do more damage to your opponent than they do to you.</li>
+  </ul>
+  `,
+  'Damage Dealt to Objectives': `
+  <b>Advice:</b>
+  <ul>
+    <li>Taking objectives is a good way to gain an advantage over the enemy team.</li>
+  </ul>
+  `//'Damage Dealt to Objectives'
 }
 
 var statsAverage = null
@@ -123,7 +147,7 @@ class Stat {
   constructor (name) {
     this.name = name
     this.value = statsPlayer[STATS_NAME[this.name]]
-    this.ratio = this.value / statsDivision[STATS_NAME[this.name]]
+    this.ratio = this.value / statsDivision[ROLES[role]][STATS_NAME[this.name]]
     this.state = this.ratio < 0.95
       ? 'bad'
       : this.ratio <= 1.05
@@ -191,7 +215,7 @@ class Stat {
 
   update () {
     this.statValueLayout.classList.remove(this.state)
-    this.ratio = this.value / statsDivision[STATS_NAME[this.name]]
+    this.ratio = this.value / statsDivision[ROLES[role]][STATS_NAME[this.name]]
     this.state = this.ratio < 0.95
       ? 'bad'
       : this.ratio <= 1.05
@@ -299,6 +323,8 @@ updateStatsAverage().then(() => {
     kda = new Stat('KDA');
     visionScore = new Stat('Vision Score');
     visionWards = new Stat('Vision Wards');
+    damageDealtToChampions = new Stat('Damage Dealt to Champions');
+    damageDealtToObjectives = new Stat('Damage Dealt to Objectives');
     coach.say('Click on a stat to learn how to improve it.');
   })
 })

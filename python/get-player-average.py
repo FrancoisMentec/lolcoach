@@ -123,15 +123,32 @@ async def getMatchData(matchID, region):
 		return getAPIData(url)
 
 def getAverageStatsByAccountID(accountID, region):
+<<<<<<< HEAD
+=======
+	matchStats = {
+		"cs": []
+		, "KDA": []
+		, "kp": []
+		, "damageDealtToObjectives": []
+		, "turretDamage": []
+		, "visionScore": []
+		, "visionWardsBoughtInGame": []
+		, "neutralMinionsKilledTeamJungle": []
+		, "neutralMinionsKilledEnemyJungle": []
+		, "damageDealtToChampions": []
+	}
+
+	averageStats = {}
+>>>>>>> 55ec569f295de7a5db82a15f137dd8f3fcf4b913
 
 	matchList = getMatchList(accountID, region, maxGames = 10)
-	
+
 	matchIDs = [ match['gameId'] for match in matchList['matches']]
-	
+
 	loop = asyncio.get_event_loop()
-	
+
 	matches = asyncio.gather(*[getMatchData(matchID, region) for matchID in matchIDs])
-	
+
 	matchInfo = loop.run_until_complete(matches)
 
 	loop.close()
@@ -192,6 +209,7 @@ def getAverageStatsByAccountID(accountID, region):
 		if totalKills[participant['teamId']] > 0:
 			playerRow["kp"] = (participantStats['kills'] + participantStats['assists']) / totalKills[participant['teamId']]
 		else:
+<<<<<<< HEAD
 			playerRow["kp"] = 0
 
 		playerRow["objectiveDamage"] = participantStats['damageDealtToObjectives']
@@ -201,6 +219,17 @@ def getAverageStatsByAccountID(accountID, region):
 		playerRow["neutralMinionsKilledTeamJungle"] = participantStats['neutralMinionsKilledTeamJungle'] *60 / match['gameDuration']
 		playerRow["neutralMinionsKilledEnemyJungle"] = participantStats['neutralMinionsKilledEnemyJungle'] *60 / match['gameDuration']
 		playerRow["totalDamageDealtToChampions"] = participantStats['totalDamageDealtToChampions']
+=======
+			matchStats["kp"].append(0)
+
+		matchStats["damageDealtToObjectives"].append(participantStats['damageDealtToObjectives'])
+		matchStats["turretDamage"].append(participantStats['damageDealtToTurrets'])
+		matchStats["visionScore"].append(participantStats['visionScore'])
+		matchStats["visionWardsBoughtInGame"].append(participantStats['visionWardsBoughtInGame'])
+		matchStats["neutralMinionsKilledTeamJungle"].append(participantStats['neutralMinionsKilledTeamJungle'] *60 / match['gameDuration'])
+		matchStats["neutralMinionsKilledEnemyJungle"].append(participantStats['neutralMinionsKilledEnemyJungle'] *60 / match['gameDuration'])
+		matchStats["damageDealtToChampions"].append(participantStats['totalDamageDealtToChampions'])
+>>>>>>> 55ec569f295de7a5db82a15f137dd8f3fcf4b913
 		#matchStats[""].append(participantStats[''])
 		playerData.append(playerRow)
 	
@@ -215,10 +244,10 @@ def getAverageStatsByAccountID(accountID, region):
 def getAllStatsFromSummonerName(summonerName, region):
 	accountID, summonerID = getIDFromSummonerName(summonerName, region)
 	league = getLeagueBySummonerId(summonerID, region)
-	
+
 	globalStats = getGlobalAverageStats(league)
 	playerStats = getAverageStatsByAccountID(accountID, region)
-	
+
 	print(json.dumps({"global":globalStats,"player":playerStats}))
 
 getAllStatsFromSummonerName(player, region)
