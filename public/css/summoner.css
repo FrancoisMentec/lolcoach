@@ -34,7 +34,6 @@
 #coach-layout {
   display: inline-block;
   width: 200px;
-  text-align: center;
 }
 
 /* coach */
@@ -63,6 +62,7 @@
   color: #323232;
   animation-name: coach-speaking-animation;
   animation-duration: 1s;
+  box-shadow: 0 4px 5px rgba(0,0,0,0.24);
 }
 
 .coach-speaking:first-child {
@@ -84,6 +84,7 @@
 }
 
 #coach {
+  width: calc(100% - 16px);
   margin: 8px;
   height: auto;
 }

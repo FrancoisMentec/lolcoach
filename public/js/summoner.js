@@ -9,8 +9,8 @@ var roleSelect = document.getElementById('role')
 var role = roleSelect.value
 roleSelect.addEventListener('change', e => {
   role = roleSelect.value
-  farming.updateChart()
-  killParticipation.updateChart()
+  farming.update()
+  killParticipation.update()
 })
 
 document.getElementById('summoner-greeting').innerHTML = summoner
@@ -90,10 +90,11 @@ var statsLayout = document.getElementById('stats-layout')
 class Stat {
   constructor (name) {
     this.name = name
-    this.value = statsPlayer[STATS_NAME[name]]
-    this.state = statsPlayer[STATS_NAME[name]] < 0.95 * statsDivision[STATS_NAME[name]]
+    this.value = statsPlayer[STATS_NAME[this.name]]
+    this.ratio = this.value / statsDivision[STATS_NAME[this.name]]
+    this.state = this.ratio < 0.95
       ? 'bad'
-      : statsPlayer[STATS_NAME[name]] <= 1.05 * statsDivision[STATS_NAME[name]]
+      : this.ratio <= 1.05
         ? 'avg'
         : 'good'
     this.expanded = false
@@ -146,7 +147,7 @@ class Stat {
     this.statAdvices.innerHTML = STAT_ADVICES[this.name]
     this.div.appendChild(this.statAdvices)
 
-    this.updateChart()
+    this.update()
   }
 
   expand () {
@@ -159,7 +160,16 @@ class Stat {
     this.div.classList.remove('expanded')
   }
 
-  updateChart () {
+  update () {
+    this.statValueLayout.classList.remove(this.state)
+    this.ratio = this.value / statsDivision[STATS_NAME[this.name]]
+    this.state = this.ratio < 0.95
+      ? 'bad'
+      : this.ratio <= 1.05
+        ? 'avg'
+        : 'good'
+    this.statValueLayout.classList.add(this.state)
+    // update the charts
     let labels = []
     let dataOthers = []
     let dataYourself = []
@@ -183,7 +193,7 @@ class Stat {
           labels: labels,
           datasets: [{
               label: 'Others',
-              pointRadius: 0,
+              pointRadius: 2,
               backgroundColor: 'rgba(244, 67, 54, 0.2)',
               pointBackgroundColor: 'rgb(244, 67, 54)',
               borderColor: 'rgb(244, 67, 54)',
