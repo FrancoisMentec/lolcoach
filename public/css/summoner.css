@@ -34,6 +34,7 @@
 #coach-layout {
   display: inline-block;
   width: 200px;
+  text-align: center;
 }
 
 /* coach */
@@ -83,7 +84,6 @@
 }
 
 #coach {
-  width: calc(100% - 16px);
   margin: 8px;
   height: auto;
 }
