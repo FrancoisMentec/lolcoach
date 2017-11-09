@@ -1,3 +1,4 @@
 node_modules
 python/data/API_KEY
 python/cache/*
+!python/cache/*.txt
