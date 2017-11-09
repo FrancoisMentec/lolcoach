@@ -127,7 +127,7 @@ def getAverageStatsByAccountID(accountID, region):
 		"cs": []
 		, "KDA": []
 		, "kp": []
-		, "objectiveDamage": []
+		, "damageDealtToObjectives": []
 		, "turretDamage": []
 		, "visionScore": []
 		, "visionWardsBoughtInGame": []
@@ -139,13 +139,13 @@ def getAverageStatsByAccountID(accountID, region):
 	averageStats = {}
 
 	matchList = getMatchList(accountID, region, maxGames = 10)
-	
+
 	matchIDs = [ match['gameId'] for match in matchList['matches']]
-	
+
 	loop = asyncio.get_event_loop()
-	
+
 	matches = asyncio.gather(*[getMatchData(matchID, region) for matchID in matchIDs])
-	
+
 	matchInfo = loop.run_until_complete(matches)
 
 	loop.close()
@@ -218,7 +218,7 @@ def getAverageStatsByAccountID(accountID, region):
 		else:
 			matchStats["kp"].append(0)
 
-		matchStats["objectiveDamage"].append(participantStats['damageDealtToObjectives'])
+		matchStats["damageDealtToObjectives"].append(participantStats['damageDealtToObjectives'])
 		matchStats["turretDamage"].append(participantStats['damageDealtToTurrets'])
 		matchStats["visionScore"].append(participantStats['visionScore'])
 		matchStats["visionWardsBoughtInGame"].append(participantStats['visionWardsBoughtInGame'])
@@ -237,10 +237,10 @@ def getAverageStatsByAccountID(accountID, region):
 def getAllStatsFromSummonerName(summonerName, region):
 	accountID, summonerID = getIDFromSummonerName(summonerName, region)
 	league = getLeagueBySummonerId(summonerID, region)
-	
+
 	globalStats = getGlobalAverageStats(league)
 	playerStats = getAverageStatsByAccountID(accountID, region)
-	
+
 	print(json.dumps({"global":globalStats,"player":playerStats}))
 
 getAllStatsFromSummonerName(player, region)
