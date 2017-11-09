@@ -155,7 +155,6 @@ def getAverageStatsByAccountID(accountID, region):
 				break
 		if participantID == 0:
 			continue
-		#print("Participant: " + str(participantID))
 
 		# get the participant's stats
 		# and the kda totals for all participants
@@ -167,7 +166,6 @@ def getAverageStatsByAccountID(accountID, region):
 
 		if not playerRow['position'] in ["JUNGLE_NONE","TOP_SOLO","MIDDLE_SOLO","BOTTOM_DUO_CARRY","BOTTOM_DUO_SUPPORT"]:
 			continue
-		#print(participantStats)
 
 		# KP
 		# Match timeline data
