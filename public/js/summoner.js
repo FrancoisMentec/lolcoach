@@ -347,9 +347,9 @@ class Coach {
 
   say (sentence) {
     var speakingLayout = document.getElementById("coach-speaking-layout");
-    while (speakingLayout.firstChild) {
+    /*while (speakingLayout.firstChild) {
       speakingLayout.removeChild(speakingLayout.firstChild);
-    }
+    }*/
     let speak = document.createElement('div')
     speak.classList.add('coach-speaking')
     speak.innerHTML = sentence
@@ -357,6 +357,9 @@ class Coach {
       this.speakingLayout.removeChild(speak)
     })
     this.speakingLayout.appendChild(speak)
+    setTimeout(() => {
+      this.speakingLayout.removeChild(speak)
+    }, 8000)
     this.layout.scrollTop = this.layout.scrollHeight
     this.animate()
   }
