@@ -260,7 +260,7 @@ class Stat {
     this.statValueLayout.classList.remove(this.state)
     this.ratio = this.value / statsDivision[ROLES[role]][STATS_NAME[this.name]]
     if (this.ratio < TERRIBLE_THRESHOLD) {
-      coach.say(`Your <b>${this.name}</b> as a <b>${role}</b> is terrible, you should work on it.`)
+      coach.say(`Your <b>${this.name}</b> as a <b>${role}</b> looks to be a weakness, you should work on it.`)
     }
     this.state = this.ratio < 0.95
       ? 'bad'
@@ -462,8 +462,7 @@ updateStatsAverage().then(() => {
     analysisInfo = document.createElement('div');
     analysisInfo.innerHTML = "<span>Analyzed the " + statsPlayer['ALL']['count'] + " most recent games and compared stats to other " + rankName + " players</span>";
     //statsLayout.appendChild(analysisInfo)
-
-    //document.getElementById('stats-layout').innerHTML = "<span>Analyzed the " + statsPlayer['ALL']['count'] + " most recent games and compared stats to other " + rankName + " players</span>";
+    coach.say("<span>Analyzed the " + statsPlayer['ALL']['count'] + " most recent games and compared stats to other " + rankName + " players</span>");
 
     // sort the stats based on the weakness ratio of the stat
     stats.sort((a,b) => { return a.ratio - b.ratio })
@@ -472,10 +471,6 @@ updateStatsAverage().then(() => {
     for(var i = 0; i < stats.length; i++) {
         stats[i].addToPage()
     }
-
-
-
-    document.getElementById('info-layout').innerHTML = "<span>Analyzed the " + statsPlayer['ALL']['count'] + " most recent games and compared stats to other " + rankName + " players</span>";
 
     coach.say('Click on a stat to learn how to improve it.');
   })

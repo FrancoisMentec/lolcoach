@@ -91,6 +91,24 @@ select:hover, select:active {
   text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.5);
 }
 
+#sub-title {
+    width: 100%;
+    text-align: center;
+    font-family: Roboto-Thin;
+    font-size: 1.5em;
+    text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.5);
+}
+
+#footer-text {
+    position: fixed;
+    bottom: 5;
+    width: 100%;
+    text-align: center;
+    font-family: Roboto-Thin;
+    font-size: 1em;
+    text-shadow: 0 -1px 6px rgba(0, 0, 0, 1);
+}
+
 #search-form {
   display: inline-block;
   position: fixed;
