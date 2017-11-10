@@ -327,7 +327,9 @@ function updateRadar () {
   let ostat = []
   for (let stat in STATS_NAME) {
     labels.push(STAT_SHORT_UNITS[stat])
-    ystat.push(statsPlayer[ROLES[role]][STATS_NAME[stat]] / statsDivision[ROLES[role]][STATS_NAME[stat]])
+    ystat.push(typeof statsPlayer[ROLES[role]] !== 'undefined'
+      ? statsPlayer[ROLES[role]][STATS_NAME[stat]] / statsDivision[ROLES[role]][STATS_NAME[stat]]
+      : 0)
     ostat.push(1)
   }
   let radarLayout = document.getElementById('radar-layout')
