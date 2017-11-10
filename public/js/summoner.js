@@ -116,7 +116,7 @@ const STAT_ADVICES = {
   <ul>
     <li>Destroying turrets is a good way to gain an advantage over the enemy team.</li>
   </ul>
-  `//Damage Dealt to Turrets
+  `
 }
 
 var statsAverage = null
@@ -176,51 +176,6 @@ class Stat {
         ? 'avg'
         : 'good'
     this.expanded = false
-
-    this.div = document.createElement('div')
-    this.div.classList.add('stat-layout')
-    this.div.addEventListener('click', e => {
-      if (!this.expanded) {
-        this.expand()
-      }
-    })
-    statsLayout.appendChild(this.div)
-
-    this.expandButton = document.createElement('div')
-    this.expandButton.classList.add('stat-layout-button')
-    this.expandButton.addEventListener('click', e => {
-      if (this.expanded) {
-        e.stopPropagation()
-        this.collapse()
-      }
-    })
-    this.div.appendChild(this.expandButton)
-
-    this.statsDiv = document.createElement('div')
-    this.statsDiv.classList.add('stat-stats')
-    this.div.appendChild(this.statsDiv)
-
-    this.nameDiv = document.createElement('div')
-    this.nameDiv.classList.add('stat-name')
-    this.nameDiv.innerHTML = this.name
-    this.statsDiv.appendChild(this.nameDiv)
-
-    this.statValueLayout = document.createElement('div')
-    this.statValueLayout.classList.add('stat-value-layout')
-    this.statValueLayout.classList.add(this.state)
-    this.statsDiv.appendChild(this.statValueLayout)
-    this.statValueDiv = document.createElement('span')
-    this.statValueDiv.classList.add('stat-value')
-    this.statValueDiv.innerHTML = Math.round(this.value * 100) / 100
-    this.statValueLayout.appendChild(this.statValueDiv)
-    this.statValueLayout.appendChild(document.createTextNode(' ' + STAT_UNITS[this.name]))
-
-    this.statAdvices = document.createElement('div')
-    this.statAdvices.classList.add('stat-advices')
-    this.statAdvices.innerHTML = STAT_ADVICES[this.name]
-    this.div.appendChild(this.statAdvices)
-
-    this.update()
 
     stats.push(this)
   }
@@ -297,6 +252,53 @@ class Stat {
         }
     })
   }
+
+  addToPage() {
+      this.div = document.createElement('div')
+      this.div.classList.add('stat-layout')
+      this.div.addEventListener('click', e => {
+        if (!this.expanded) {
+          this.expand()
+        }
+      })
+      statsLayout.appendChild(this.div)
+
+      this.expandButton = document.createElement('div')
+      this.expandButton.classList.add('stat-layout-button')
+      this.expandButton.addEventListener('click', e => {
+        if (this.expanded) {
+          e.stopPropagation()
+          this.collapse()
+        }
+      })
+      this.div.appendChild(this.expandButton)
+
+      this.statsDiv = document.createElement('div')
+      this.statsDiv.classList.add('stat-stats')
+      this.div.appendChild(this.statsDiv)
+
+      this.nameDiv = document.createElement('div')
+      this.nameDiv.classList.add('stat-name')
+      this.nameDiv.innerHTML = this.name
+      this.statsDiv.appendChild(this.nameDiv)
+
+      this.statValueLayout = document.createElement('div')
+      this.statValueLayout.classList.add('stat-value-layout')
+      this.statValueLayout.classList.add(this.state)
+      this.statsDiv.appendChild(this.statValueLayout)
+      this.statValueDiv = document.createElement('span')
+      this.statValueDiv.classList.add('stat-value')
+      this.statValueDiv.innerHTML = Math.round(this.value * 100) / 100
+      this.statValueLayout.appendChild(this.statValueDiv)
+      this.statValueLayout.appendChild(document.createTextNode(' ' + STAT_UNITS[this.name]))
+
+      this.statAdvices = document.createElement('div')
+      this.statAdvices.classList.add('stat-advices')
+      this.statAdvices.innerHTML = STAT_ADVICES[this.name]
+      this.div.appendChild(this.statAdvices)
+
+      this.update()
+  }
 }
 
 // Coach
@@ -319,7 +321,16 @@ class Coach {
 }
 
 var coach = new Coach()
-coach.say('Hello fleshling! I am analyzing your stats, standby.')
+coach.say('Hello fleshling! I am analyzing your stats, standby.');
+
+function compare(a,b)
+{
+    if (a.ratio < b.ratio)
+        return -1;
+    if (a.ratio > b.ratio)
+        return 1;
+    return 0;
+}
 
 function updateRadar () {
   let labels = []
@@ -384,6 +395,17 @@ updateStatsAverage().then(() => {
     damageDealtToChampions = new Stat('Damage Dealt to Champions');
     damageDealtToObjectives = new Stat('Damage Dealt to Objectives');
     damageDealtToTurrets = new Stat('Damage Dealt to Turrets');
+
+    // sort the stats based on the weakness ratio of the stat
+    console.log(stats);
+    stats.sort(compare);
+    console.log(stats);
+
+    for(var i = 0; i < stats.length; i++)
+    {
+        stats[i].addToPage();
+    }
+
     coach.say('Click on a stat to learn how to improve it.');
   })
 })
