@@ -2,6 +2,7 @@
   font-family: Roboto-Thin;
   font-size: 3em;
   padding: 8px;
+  width: calc(100% - 200px);
 }
 
 #summoner-greeting {
@@ -28,15 +29,40 @@
 
 #stats-layout {
   display: inline-block;
-  width: calc(100% - 200px);
+  width: calc(100% - 500px);
 }
 
-#coach-layout {
+#overall-layout {
   display: inline-block;
-  width: 200px;
+  width: 300px;
+}
+
+#overall-layout {
+  box-sizing: border-box;
+  width: 284px;
+  padding: 5px;
+  background-color: white;
+  color: #323232;
+  margin: 8px;
+  border-radius: 2px;
+}
+
+#radar-layout {
+  width: 274px;
+  height: 274px;
 }
 
 /* coach */
+#coach-layout  {
+  position: fixed;
+  display: inline-block;
+  width: 200px;
+  height: 100%;
+  overflow: hidden;
+  top: 0;
+  right: 0;
+}
+
 #coach-speaking-layout {
   width: 100%;
 }

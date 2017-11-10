@@ -14,6 +14,8 @@ roleSelect.addEventListener('change', e => {
 
 document.getElementById('summoner-greeting').innerHTML = summoner
 
+const TERRIBLE_THRESHOLD = 0.5
+
 const LEAGUES = ['unranked', 'bronze', 'silver', 'gold', 'platinum', 'diamond', 'master', 'challenger']
 
 const ROLES = {
@@ -33,6 +35,17 @@ const STAT_UNITS = {
   'Damage Dealt to Champions': 'Dmg to Champs',
   'Damage Dealt to Objectives': 'Dmg to Objectives',
   'Damage Dealt to Turrets': 'Dmg to Turrets'
+}
+
+const STAT_SHORT_UNITS = {
+  'Farming': 'CS',
+  'Kill Participation': 'KP',
+  'KDA': 'KDA',
+  'Vision Score': 'VS',
+  'Vision Wards': 'Pink',
+  'Damage Dealt to Champions': 'D2C',
+  'Damage Dealt to Objectives': 'D2O',
+  'Damage Dealt to Turrets': 'D2T'
 }
 
 // value should match the json webservice key
@@ -105,7 +118,7 @@ const STAT_ADVICES = {
   <ul>
     <li>Destroying turrets is a good way to gain an advantage over the enemy team.</li>
   </ul>
-  `//Damage Dealt to Turrets
+  `
 }
 
 var statsAverage = null
@@ -146,8 +159,13 @@ var stats = []
 var statsLayout = document.getElementById('stats-layout')
 
 function updateAllStats () {
+  updateRadar()
   for (let i in stats) {
     stats[i].update()
+  }
+  stats.sort((a,b) => { return a.ratio - b.ratio })
+  for(var i = 0; i < stats.length; i++) {
+      stats[i].addToPage()
   }
 }
 
@@ -172,7 +190,7 @@ class Stat {
         this.expand()
       }
     })
-    statsLayout.appendChild(this.div)
+    //statsLayout.appendChild(this.div)
 
     this.expandButton = document.createElement('div')
     this.expandButton.classList.add('stat-layout-button')
@@ -230,6 +248,9 @@ class Stat {
     this.statValueDiv.innerHTML = Math.round(this.value * 100) / 100
     this.statValueLayout.classList.remove(this.state)
     this.ratio = this.value / statsDivision[ROLES[role]][STATS_NAME[this.name]]
+    if (this.ratio < TERRIBLE_THRESHOLD) {
+      coach.say(`Your <b>${this.name}</b> as a <b>${role}</b> is terrible, you should work on it.`)
+    }
     this.state = this.ratio < 0.95
       ? 'bad'
       : this.ratio <= 1.05
@@ -259,7 +280,7 @@ class Stat {
       this.statsDiv.removeChild(this.rankingDiv)
     }
     this.rankingDiv = document.createElement('canvas')
-    this.rankingDiv.setAttribute('width', 251)
+    this.rankingDiv.setAttribute('width', 250)
     this.rankingDiv.setAttribute('height', 200)
     this.statsDiv.appendChild(this.rankingDiv)
 
@@ -285,6 +306,13 @@ class Stat {
         }
     })
   }
+
+  addToPage() {
+    if (this.div.parentNode == statsLayout) {
+      statsLayout.removeChild(this.div)
+    }
+    statsLayout.appendChild(this.div)
+  }
 }
 
 // Coach
@@ -303,41 +331,68 @@ class Coach {
     let old = this.coach
     this.coach = old.cloneNode(true)
     this.layout.replaceChild(this.coach, old)
+    this.layout.scrollTop = this.layout.scrollHeight
   }
 }
 
 var coach = new Coach()
-coach.say('Hello fleshling! I am analyzing your stats, standby.')
+coach.say('Hello fleshling! I am analyzing your stats, standby.');
+
+function updateRadar () {
+  let labels = []
+  let ystat = []
+  let ostat = []
+  for (let stat in STATS_NAME) {
+    labels.push(STAT_SHORT_UNITS[stat])
+    ystat.push(typeof statsPlayer[ROLES[role]] !== 'undefined'
+      ? statsPlayer[ROLES[role]][STATS_NAME[stat]] / statsDivision[ROLES[role]][STATS_NAME[stat]]
+      : 0)
+    ostat.push(1)
+  }
+  let radarLayout = document.getElementById('radar-layout')
+  if (typeof radar !== 'undefined') {
+    document.getElementById('radar-layout').removeChild(radar)
+  }
+  radar = document.createElement('canvas')
+  radar.setAttribute('width', 274)
+  radar.setAttribute('height', 274)
+  document.getElementById('radar-layout').appendChild(radar)
+  radarChart = new Chart(radar, {
+    type: 'radar',
+    data: {
+      labels: labels,
+      datasets: [{
+        label: 'Yourself',
+        backgroundColor: 'rgba(0, 150, 136, 0.2)',
+        pointBackgroundColor: 'rgb(0, 150, 136)',
+        borderColor: 'rgb(0, 150, 136)',
+        data: ystat
+      },{
+        label: 'Others',
+        backgroundColor: 'rgba(244, 67, 54, 0.2)',
+        pointBackgroundColor: 'rgb(244, 67, 54)',
+        borderColor: 'rgb(244, 67, 54)',
+        data: ostat
+      }]
+    }
+  })
+}
 
 updateStatsAverage().then(() => {
   updateStatsPlayer().then(() => {
-    /*let labels = []
-    let ystat = []
-    let ostat = []
-    for (let stat in statsPlayer) {
-      labels.push(stat)
-      ystat.push(statsPlayer[stat])
-      ostat.push(statsDivision[stat])
-    }
-    radarChart = new Chart(document.getElementById('radar'), {
-      type: 'radar',
-      data: {
-        labels: labels,
-        datasets: [{
-          label: 'Yourself',
-          backgroundColor: 'rgba(0, 150, 136, 0.2)',
-          pointBackgroundColor: 'rgb(0, 150, 136)',
-          borderColor: 'rgb(0, 150, 136)',
-          data: ystat
-        },{
-          label: 'Others',
-          backgroundColor: 'rgba(244, 67, 54, 0.2)',
-          pointBackgroundColor: 'rgb(244, 67, 54)',
-          borderColor: 'rgb(244, 67, 54)',
-          data: ostat
-        }]
+    // look for most played role
+    let maxCount = 0
+    let maxRole = 'top'
+    for (let role in ROLES) {
+      if (statsPlayer[ROLES[role]] && statsPlayer[ROLES[role]].count > maxCount) {
+        maxCount = statsPlayer[ROLES[role]].count
+        maxRole = role
       }
-    })*/
+    }
+    role = roleSelect.value = maxRole
+    // radar chart
+    updateRadar()
+    // create stats
     farming = new Stat('Farming');
     killParticipation = new Stat('Kill Participation');
     kda = new Stat('KDA');
@@ -346,6 +401,13 @@ updateStatsAverage().then(() => {
     damageDealtToChampions = new Stat('Damage Dealt to Champions');
     damageDealtToObjectives = new Stat('Damage Dealt to Objectives');
     damageDealtToTurrets = new Stat('Damage Dealt to Turrets');
+
+    // sort the stats based on the weakness ratio of the stat
+    stats.sort((a,b) => { return a.ratio - b.ratio })
+    for(var i = 0; i < stats.length; i++) {
+        stats[i].addToPage()
+    }
+
     coach.say('Click on a stat to learn how to improve it.');
   })
 })
