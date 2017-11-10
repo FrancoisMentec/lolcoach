@@ -235,6 +235,8 @@ def getWeekPlayerStats(accountID, region):
 	
 	arraySend = []
 	for w in weekStats:
+		if len(weekStats[w]) == 0:
+			continue
 		df = pd.DataFrame(weekStats[w])
 		sMean = df.mean()
 		sMean.name="ALL"
