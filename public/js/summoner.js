@@ -8,13 +8,8 @@ var summoner = regexRes[2]
 var roleSelect = document.getElementById('role')
 var role = roleSelect.value
 roleSelect.addEventListener('change', e => {
-  //if (typeof statsPlayer[ROLES[roleSelect.value]] !== 'undefined') {
-    role = roleSelect.value
-    updateAllStats()
-  /*} else {
-    alert('you never played ' + roleSelect.value)
-    roleSelect.value = role
-  }*/
+  role = roleSelect.value
+  updateAllStats()
 })
 
 document.getElementById('summoner-greeting').innerHTML = summoner
@@ -161,6 +156,21 @@ function updateStatsPlayer () {
       }
     }
     xhr.open('GET', `/stats/${region}/${summoner}`, true)
+    xhr.send()
+  })
+}
+
+var statsWeek = null
+function updateStatsWeek () {
+  return new Promise((resolve, reject) => {
+    let xhr = new XMLHttpRequest()
+    xhr.onreadystatechange = function () {
+      if (this.readyState == 4 && this.status == 200) {
+        statsWeek = JSON.parse(this.responseText.replace(/'/g, '"'))
+        resolve()
+      }
+    }
+    xhr.open('GET', `/weekStats/${region}/${summoner}`, true)
     xhr.send()
   })
 }
@@ -320,24 +330,11 @@ class Stat {
     })
 
     // update the progression stats
-    let labelsP = []
+    let labelsP = ['-3', '-2', '-1', 'current']
     let dataP = []
-    /*if (role !== 'player') {
-      for (let l = 0; l < LEAGUES.length; l++) {
-        let league = LEAGUES[l]
-        if (league === 'unranked' || league === 'master' || league === 'challenger') {
-          labels.push(league)
-          dataOthers.push(statsAverage[role][league][STATS_NAME[this.name]])
-          dataYourself.push(this.value)
-        } else {
-          for (let i = 5; i > 0; i--) {
-            labels.push(league + ' ' + i)
-            dataOthers.push(statsAverage[role][league][i][STATS_NAME[this.name]])
-            dataYourself.push(this.value)
-          }
-        }
-      }
-    }*/
+    for (let i = 0; i < statsWeek.length; i++) {
+      dataP.push(statsWeek[i][ROLES[role]][STATS_NAME[this.name]])
+    }
 
     if (this.progressionDiv) {
       this.statsDiv.removeChild(this.progressionDiv)
@@ -352,8 +349,7 @@ class Stat {
         data: {
           labels: labelsP,
           datasets: [{
-              label: 'You',
-              pointRadius: 5,
+              label: 'Your progression',
               backgroundColor: 'rgba(0, 150, 136, 0.2)',
               pointBackgroundColor: 'rgb(0, 150, 136)',
               borderColor: 'rgb(0, 150, 136)',
@@ -474,51 +470,53 @@ function updateRadar () {
 
 updateStatsAverage().then(() => {
   updateStatsPlayer().then(() => {
-    // disable not played role
-    let options = roleSelect.getElementsByTagName('option')
-    for (let o = 0; o < options.length; o++) {
-      let option = options[o]
-      if (typeof statsPlayer[ROLES[option.value]] === 'undefined') {
-        option.disabled = true
+    updateStatsWeek().then(() => {
+      // disable not played role
+      let options = roleSelect.getElementsByTagName('option')
+      for (let o = 0; o < options.length; o++) {
+        let option = options[o]
+        if (typeof statsPlayer[ROLES[option.value]] === 'undefined') {
+          option.disabled = true
+        }
       }
-    }
-    // look for most played role
-    let maxCount = 0
-    let maxRole = 'top'
-    for (let role in ROLES) {
-      if (statsPlayer[ROLES[role]] && statsPlayer[ROLES[role]].count > maxCount) {
-        maxCount = statsPlayer[ROLES[role]].count
-        maxRole = role
+      // look for most played role
+      let maxCount = 0
+      let maxRole = 'top'
+      for (let role in ROLES) {
+        if (statsPlayer[ROLES[role]] && statsPlayer[ROLES[role]].count > maxCount) {
+          maxCount = statsPlayer[ROLES[role]].count
+          maxRole = role
+        }
       }
-    }
-    role = roleSelect.value = maxRole
-    // radar chart
-    updateRadar()
-    // create stats
-    farming = new Stat('Farming');
-    killParticipation = new Stat('Kill Participation');
-    kda = new Stat('KDA');
-    visionScore = new Stat('Vision Score');
-    visionWards = new Stat('Vision Wards');
-    damageDealtToChampions = new Stat('Damage Dealt to Champions');
-    damageDealtToObjectives = new Stat('Damage Dealt to Objectives');
-    damageDealtToTurrets = new Stat('Damage Dealt to Turrets');
+      role = roleSelect.value = maxRole
+      // radar chart
+      updateRadar()
+      // create stats
+      farming = new Stat('Farming');
+      killParticipation = new Stat('Kill Participation');
+      kda = new Stat('KDA');
+      visionScore = new Stat('Vision Score');
+      visionWards = new Stat('Vision Wards');
+      damageDealtToChampions = new Stat('Damage Dealt to Champions');
+      damageDealtToObjectives = new Stat('Damage Dealt to Objectives');
+      damageDealtToTurrets = new Stat('Damage Dealt to Turrets');
 
-    //stats-layout
-    nameParts = statsPlayer['ALL']['rank'].split("_");
-    rankName = nameParts[0].toLowerCase() + " " + nameParts[1];
-    rankName = rankName.charAt(0).toUpperCase() + rankName.slice(1);
+      //stats-layout
+      nameParts = statsPlayer['ALL']['rank'].split("_");
+      rankName = nameParts[0].toLowerCase() + " " + nameParts[1];
+      rankName = rankName.charAt(0).toUpperCase() + rankName.slice(1);
 
-    coach.say(`<span>Analyzed the <b>${statsPlayer['ALL']['count']}</b> most recent games and compared stats to other <b>${rankName}</b> players.</span>`)
+      coach.say(`<span>Analyzed the <b>${statsPlayer['ALL']['count']}</b> most recent games and compared stats to other <b>${rankName}</b> players.</span>`)
 
-    // sort the stats based on the weakness ratio of the stat
-    stats.sort((a,b) => { return a.ratio - b.ratio })
+      // sort the stats based on the weakness ratio of the stat
+      stats.sort((a,b) => { return a.ratio - b.ratio })
 
-    // add the stats to the page in the correct order
-    for(var i = 0; i < stats.length; i++) {
-        stats[i].addToPage()
-    }
+      // add the stats to the page in the correct order
+      for(var i = 0; i < stats.length; i++) {
+          stats[i].addToPage()
+      }
 
-    coach.say('Click on a stat to learn how to improve it.');
+      coach.say('Click on a stat to learn how to improve it.');
+    })
   })
 })
