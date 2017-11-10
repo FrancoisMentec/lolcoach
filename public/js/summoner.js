@@ -434,6 +434,7 @@ var coach = new Coach()
 coach.say('Greetings fleshling! I am analyzing your stats, standby.');
 
 function updateRadar () {
+  document.getElementById('performance-title').innerHTML = `Performance over past ${statsPlayer[ROLES[role]]['count']} games as a ${role}`
   let labels = []
   let ystat = []
   let ostat = []
