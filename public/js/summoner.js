@@ -8,13 +8,13 @@ var summoner = regexRes[2]
 var roleSelect = document.getElementById('role')
 var role = roleSelect.value
 roleSelect.addEventListener('change', e => {
-  if (typeof statsPlayer[ROLES[roleSelect.value]] !== 'undefined') {
+  //if (typeof statsPlayer[ROLES[roleSelect.value]] !== 'undefined') {
     role = roleSelect.value
     updateAllStats()
-  } else {
+  /*} else {
     alert('you never played ' + roleSelect.value)
     roleSelect.value = role
-  }
+  }*/
 })
 
 document.getElementById('summoner-greeting').innerHTML = summoner
@@ -414,6 +414,15 @@ function updateRadar () {
 
 updateStatsAverage().then(() => {
   updateStatsPlayer().then(() => {
+    // disable not played role
+    let options = roleSelect.getElementsByTagName('option')
+    for (let o in options) {
+      let option = options[o]
+      console.log(option.value)
+      if (typeof statsPlayer[ROLES[option.value]] === 'undefined') {
+        option.disabled = true
+      }
+    }
     // look for most played role
     let maxCount = 0
     let maxRole = 'top'
