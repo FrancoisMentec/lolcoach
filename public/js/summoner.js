@@ -318,6 +318,56 @@ class Stat {
           }]
         }
     })
+
+    // update the progression stats
+    let labelsP = []
+    let dataP = []
+    /*if (role !== 'player') {
+      for (let l = 0; l < LEAGUES.length; l++) {
+        let league = LEAGUES[l]
+        if (league === 'unranked' || league === 'master' || league === 'challenger') {
+          labels.push(league)
+          dataOthers.push(statsAverage[role][league][STATS_NAME[this.name]])
+          dataYourself.push(this.value)
+        } else {
+          for (let i = 5; i > 0; i--) {
+            labels.push(league + ' ' + i)
+            dataOthers.push(statsAverage[role][league][i][STATS_NAME[this.name]])
+            dataYourself.push(this.value)
+          }
+        }
+      }
+    }
+
+    if (this.rankingDiv) {
+      this.statsDiv.removeChild(this.rankingDiv)
+    }
+    this.rankingDiv = document.createElement('canvas')
+    this.rankingDiv.setAttribute('width', 250)
+    this.rankingDiv.setAttribute('height', 200)
+    this.statsDiv.appendChild(this.rankingDiv)
+
+    this.rankingChart = new Chart(this.rankingDiv, {
+        type: 'line',
+        data: {
+          labels: labels,
+          datasets: [{
+              label: 'Others',
+              pointRadius: 2,
+              backgroundColor: 'rgba(244, 67, 54, 0.2)',
+              pointBackgroundColor: 'rgb(244, 67, 54)',
+              borderColor: 'rgb(244, 67, 54)',
+              data: dataOthers,
+          },{
+              label: 'You',
+              pointRadius: 0,
+              backgroundColor: 'rgba(0, 150, 136, 0.2)',
+              pointBackgroundColor: 'rgb(0, 150, 136)',
+              borderColor: 'rgb(0, 150, 136)',
+              data: dataYourself,
+          }]
+        }
+    })*/
   }
 
   addToPage() {
