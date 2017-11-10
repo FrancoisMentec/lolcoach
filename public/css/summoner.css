@@ -37,15 +37,19 @@
   width: 300px;
 }
 
-#radar-layout {
+#overall-layout {
   box-sizing: border-box;
   width: 284px;
-  height: 284px;
   padding: 5px;
   background-color: white;
   color: #323232;
   margin: 8px;
   border-radius: 2px;
+}
+
+#radar-layout {
+  width: 274px;
+  height: 274px;
 }
 
 /* coach */
