@@ -409,19 +409,23 @@ class Coach {
         this.rotating = true
         setTimeout(() => {
           this.coach.classList.remove('full-rotate')
+          this.say('Stop it fleshling!')
           this.rotating = false
         }, 2000)
-      } else if (!this.rotating) {
+        this.say('WooWooWooWoooooooooo')
+      } else {
         this.animate()
       }
     })
   }
 
   animate () {
-    let old = this.coach
-    this.coach = old.cloneNode(true)
-    this.bindCoach()
-    this.layout.replaceChild(this.coach, old)
+    if (!this.rotating) {
+      let old = this.coach
+      this.coach = old.cloneNode(true)
+      this.bindCoach()
+      this.layout.replaceChild(this.coach, old)
+    }
   }
 }
 

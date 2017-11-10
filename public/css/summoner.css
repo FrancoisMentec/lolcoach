@@ -93,6 +93,7 @@
   animation-duration: 1s;
   box-shadow: 0 4px 5px rgba(0,0,0,0.24);
   cursor: pointer;
+  word-wrap: break-word;
 }
 
 .coach-speaking:first-child {
@@ -131,6 +132,7 @@
   border-radius: 50%;
   background-color: #F44336;
   opacity: 0;
+  word-wrap: normal;
 }
 
 .coach-speaking:hover::before {
