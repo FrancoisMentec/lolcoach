@@ -28,12 +28,26 @@
 
 #stats-layout {
   display: inline-block;
-  width: calc(100% - 200px);
+  width: calc(100% - 500px);
 }
 
-#coach-layout {
+#coach-layout  {
   display: inline-block;
   width: 200px;
+}
+
+#overall-layout {
+  display: inline-block;
+  width: 300px;
+}
+
+#radar-layout {
+  width: 284px;
+  height: 284px;
+  background-color: white;
+  color: #323232;
+  margin: 8px;
+  border-radius: 2px;
 }
 
 /* coach */

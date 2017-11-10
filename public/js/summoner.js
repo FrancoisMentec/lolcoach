@@ -35,6 +35,17 @@ const STAT_UNITS = {
   'Damage Dealt to Turrets': 'Dmg to Turrets'
 }
 
+const STAT_SHORT_UNITS = {
+  'Farming': 'CS',
+  'Kill Participation': 'KP',
+  'KDA': 'KDA',
+  'Vision Score': 'VS',
+  'Vision Wards': 'Pink',
+  'Damage Dealt to Champions': 'D2C',
+  'Damage Dealt to Objectives': 'D2O',
+  'Damage Dealt to Turrets': 'D2T'
+}
+
 // value should match the json webservice key
 const STATS_NAME = {
   'Farming': 'cs',
@@ -146,6 +157,7 @@ var stats = []
 var statsLayout = document.getElementById('stats-layout')
 
 function updateAllStats () {
+  updateRadar()
   for (let i in stats) {
     stats[i].update()
   }
@@ -259,7 +271,7 @@ class Stat {
       this.statsDiv.removeChild(this.rankingDiv)
     }
     this.rankingDiv = document.createElement('canvas')
-    this.rankingDiv.setAttribute('width', 251)
+    this.rankingDiv.setAttribute('width', 250)
     this.rankingDiv.setAttribute('height', 200)
     this.statsDiv.appendChild(this.rankingDiv)
 
@@ -309,35 +321,47 @@ class Coach {
 var coach = new Coach()
 coach.say('Hello fleshling! I am analyzing your stats, standby.')
 
+function updateRadar () {
+  let labels = []
+  let ystat = []
+  let ostat = []
+  for (let stat in STATS_NAME) {
+    labels.push(STAT_SHORT_UNITS[stat])
+    ystat.push(statsPlayer[ROLES[role]][STATS_NAME[stat]] / statsDivision[ROLES[role]][STATS_NAME[stat]])
+    ostat.push(1)
+  }
+  let radarLayout = document.getElementById('radar-layout')
+  if (typeof radar !== 'undefined') {
+    document.getElementById('radar-layout').removeChild(radar)
+  }
+  radar = document.createElement('canvas')
+  radar.setAttribute('width', 284)
+  radar.setAttribute('height', 284)
+  document.getElementById('radar-layout').appendChild(radar)
+  radarChart = new Chart(radar, {
+    type: 'radar',
+    data: {
+      labels: labels,
+      datasets: [{
+        label: 'Yourself',
+        backgroundColor: 'rgba(0, 150, 136, 0.2)',
+        pointBackgroundColor: 'rgb(0, 150, 136)',
+        borderColor: 'rgb(0, 150, 136)',
+        data: ystat
+      },{
+        label: 'Others',
+        backgroundColor: 'rgba(244, 67, 54, 0.2)',
+        pointBackgroundColor: 'rgb(244, 67, 54)',
+        borderColor: 'rgb(244, 67, 54)',
+        data: ostat
+      }]
+    }
+  })
+}
+
 updateStatsAverage().then(() => {
   updateStatsPlayer().then(() => {
-    /*let labels = []
-    let ystat = []
-    let ostat = []
-    for (let stat in statsPlayer) {
-      labels.push(stat)
-      ystat.push(statsPlayer[stat])
-      ostat.push(statsDivision[stat])
-    }
-    radarChart = new Chart(document.getElementById('radar'), {
-      type: 'radar',
-      data: {
-        labels: labels,
-        datasets: [{
-          label: 'Yourself',
-          backgroundColor: 'rgba(0, 150, 136, 0.2)',
-          pointBackgroundColor: 'rgb(0, 150, 136)',
-          borderColor: 'rgb(0, 150, 136)',
-          data: ystat
-        },{
-          label: 'Others',
-          backgroundColor: 'rgba(244, 67, 54, 0.2)',
-          pointBackgroundColor: 'rgb(244, 67, 54)',
-          borderColor: 'rgb(244, 67, 54)',
-          data: ostat
-        }]
-      }
-    })*/
+    // look for most played role
     let maxCount = 0
     let maxRole = 'top'
     for (let role in ROLES) {
@@ -347,6 +371,9 @@ updateStatsAverage().then(() => {
       }
     }
     role = roleSelect.value = maxRole
+    // radar chart
+    updateRadar()
+    // create stats
     farming = new Stat('Farming');
     killParticipation = new Stat('Kill Participation');
     kda = new Stat('KDA');
