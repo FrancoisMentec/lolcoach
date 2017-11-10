@@ -81,10 +81,15 @@ app.get('/stats', (req, res) => {
   res.send(statsJson)
 })
 
-app.get('/stats/:region/:summoner', (req, res) => {
+function getStats (req, res) {
   child_process.exec(`${python} python/get-player-average.py ${req.params.region} "${req.params.summoner}"`, (err, stdout, stderr) => {
     if (err) {
-      console.error(err)
+      if (python === 'python3') {
+        python = 'python'
+        getStats(req, res)
+      } else {
+        console.log(err)
+      }
     } else {
       if (stderr.length > 0) {
         res.send(stderr)
@@ -94,7 +99,9 @@ app.get('/stats/:region/:summoner', (req, res) => {
       }
     }
   })
-})
+}
+
+app.get('/stats/:region/:summoner', getStats)
 
 app.get('/weekStats/:region/:summoner', (req, res) => {
   child_process.exec(`${python} python/get-player-weekly-stats.py ${req.params.region} "${req.params.summoner}"`, (err, stdout, stderr) => {

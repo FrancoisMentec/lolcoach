@@ -8,13 +8,13 @@ var summoner = regexRes[2]
 var roleSelect = document.getElementById('role')
 var role = roleSelect.value
 roleSelect.addEventListener('change', e => {
-  if (typeof statsPlayer[ROLES[roleSelect.value]] !== 'undefined') {
+  //if (typeof statsPlayer[ROLES[roleSelect.value]] !== 'undefined') {
     role = roleSelect.value
     updateAllStats()
-  } else {
+  /*} else {
     alert('you never played ' + roleSelect.value)
     roleSelect.value = role
-  }
+  }*/
 })
 
 document.getElementById('summoner-greeting').innerHTML = summoner
@@ -75,7 +75,7 @@ const STAT_ADVICES = {
       <li>Melee minions need two turret shots and one or two auto attacks, depending on your attack damage.</li>
       <li>You can use your spells to farm but don't waste all your mana unless you're planning to back.</li>
       <li>When you can't to back wait a wave that precede a cannon wave, push it fast (you can spend all your mana) then back, so if your opponent push the wave under your turret you'll loose less minions because the cannon can tank more shots.</li>
-      <li>Avoid sharing a lane as much as possible, unless you want to teamfight or prepare an objective the toplaner, the midlaner and the adc should be on different lanes.</li>
+      <li>Avoid sharing a lane as much as possible, unless you want to teamfight or prepare an objective the top laner, the mid laner and the adc should be on different lanes.</li>
     </ul>
     <b>Exercise idea :</b>
     <ul>
@@ -260,7 +260,7 @@ class Stat {
     this.statValueLayout.classList.remove(this.state)
     this.ratio = this.value / statsDivision[ROLES[role]][STATS_NAME[this.name]]
     if (this.ratio < TERRIBLE_THRESHOLD) {
-      coach.say(`Your <b>${this.name}</b> as a <b>${role}</b> is terrible, you should work on it.`)
+      coach.say(`Your <b>${this.name}</b> as a <b>${role}</b> looks to be a weakness, you should work on it.`)
     }
     this.state = this.ratio < 0.95
       ? 'bad'
@@ -318,6 +318,49 @@ class Stat {
           }]
         }
     })
+
+    // update the progression stats
+    let labelsP = []
+    let dataP = []
+    /*if (role !== 'player') {
+      for (let l = 0; l < LEAGUES.length; l++) {
+        let league = LEAGUES[l]
+        if (league === 'unranked' || league === 'master' || league === 'challenger') {
+          labels.push(league)
+          dataOthers.push(statsAverage[role][league][STATS_NAME[this.name]])
+          dataYourself.push(this.value)
+        } else {
+          for (let i = 5; i > 0; i--) {
+            labels.push(league + ' ' + i)
+            dataOthers.push(statsAverage[role][league][i][STATS_NAME[this.name]])
+            dataYourself.push(this.value)
+          }
+        }
+      }
+    }*/
+
+    if (this.progressionDiv) {
+      this.statsDiv.removeChild(this.progressionDiv)
+    }
+    this.progressionDiv = document.createElement('canvas')
+    this.progressionDiv.setAttribute('width', 250)
+    this.progressionDiv.setAttribute('height', 200)
+    this.statsDiv.appendChild(this.progressionDiv)
+
+    this.progressionChart = new Chart(this.progressionDiv, {
+        type: 'line',
+        data: {
+          labels: labelsP,
+          datasets: [{
+              label: 'You',
+              pointRadius: 5,
+              backgroundColor: 'rgba(0, 150, 136, 0.2)',
+              pointBackgroundColor: 'rgb(0, 150, 136)',
+              borderColor: 'rgb(0, 150, 136)',
+              data: dataP,
+          }]
+        }
+    })
   }
 
   addToPage() {
@@ -346,10 +389,20 @@ class Coach {
   }
 
   say (sentence) {
+    var speakingLayout = document.getElementById("coach-speaking-layout");
+    /*while (speakingLayout.firstChild) {
+      speakingLayout.removeChild(speakingLayout.firstChild);
+    }*/
     let speak = document.createElement('div')
     speak.classList.add('coach-speaking')
     speak.innerHTML = sentence
+    speak.addEventListener('click', e => {
+      this.speakingLayout.removeChild(speak)
+    })
     this.speakingLayout.appendChild(speak)
+    setTimeout(() => {
+      this.speakingLayout.removeChild(speak)
+    }, 8000)
     this.layout.scrollTop = this.layout.scrollHeight
     this.animate()
   }
@@ -370,7 +423,7 @@ class Coach {
 }
 
 var coach = new Coach()
-coach.say('Hello fleshling! I am analyzing your stats, standby.');
+coach.say('Greetings fleshling! I am analyzing your stats, standby.');
 
 function updateRadar () {
   let labels = []
@@ -396,7 +449,7 @@ function updateRadar () {
     data: {
       labels: labels,
       datasets: [{
-        label: 'Yourself',
+        label: 'You',
         backgroundColor: 'rgba(0, 150, 136, 0.2)',
         pointBackgroundColor: 'rgb(0, 150, 136)',
         borderColor: 'rgb(0, 150, 136)',
@@ -414,6 +467,14 @@ function updateRadar () {
 
 updateStatsAverage().then(() => {
   updateStatsPlayer().then(() => {
+    // disable not played role
+    let options = roleSelect.getElementsByTagName('option')
+    for (let o = 0; o < options.length; o++) {
+      let option = options[o]
+      if (typeof statsPlayer[ROLES[option.value]] === 'undefined') {
+        option.disabled = true
+      }
+    }
     // look for most played role
     let maxCount = 0
     let maxRole = 'top'
@@ -436,8 +497,20 @@ updateStatsAverage().then(() => {
     damageDealtToObjectives = new Stat('Damage Dealt to Objectives');
     damageDealtToTurrets = new Stat('Damage Dealt to Turrets');
 
+    //stats-layout
+    nameParts = statsPlayer['ALL']['rank'].split("_");
+    rankName = nameParts[0].toLowerCase() + " " + nameParts[1];
+    rankName = rankName.charAt(0).toUpperCase() + rankName.slice(1);
+
+    analysisInfo = document.createElement('div');
+    analysisInfo.innerHTML = "<span>Analyzed the " + statsPlayer['ALL']['count'] + " most recent games and compared stats to other " + rankName + " players</span>";
+    //statsLayout.appendChild(analysisInfo)
+    coach.say("<span>Analyzed the " + statsPlayer['ALL']['count'] + " most recent games and compared stats to other " + rankName + " players</span>");
+
     // sort the stats based on the weakness ratio of the stat
     stats.sort((a,b) => { return a.ratio - b.ratio })
+
+    // add the stats to the page in the correct order
     for(var i = 0; i < stats.length; i++) {
         stats[i].addToPage()
     }
