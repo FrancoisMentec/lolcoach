@@ -378,14 +378,8 @@ class Coach {
     this.layout = document.getElementById('coach-layout')
     this.coach = document.getElementById('coach')
     this.counter = 0
-    this.coach.addEventListener('click', e => {
-      if (++this.counter >= 5) {
-        this.counter = 0
-        this.say('Stop it!!!')
-      } else {
-        this.animate()
-      }
-    })
+    this.rotating = false
+    this.bindCoach()
   }
 
   say (sentence) {
@@ -407,17 +401,26 @@ class Coach {
     this.animate()
   }
 
-  animate () {
-    let old = this.coach
-    this.coach = old.cloneNode(true)
+  bindCoach () {
     this.coach.addEventListener('click', e => {
       if (++this.counter >= 5) {
         this.counter = 0
-        this.say('Stop it!!!')
-      } else {
+        this.coach.classList.add('full-rotate')
+        this.rotating = true
+        setTimeout(() => {
+          this.coach.classList.remove('full-rotate')
+          this.rotating = false
+        }, 2000)
+      } else if (!this.rotating) {
         this.animate()
       }
     })
+  }
+
+  animate () {
+    let old = this.coach
+    this.coach = old.cloneNode(true)
+    this.bindCoach()
     this.layout.replaceChild(this.coach, old)
   }
 }

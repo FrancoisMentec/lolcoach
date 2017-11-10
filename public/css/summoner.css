@@ -160,6 +160,7 @@
     transform: rotate(0deg);
   }
 }
+
 #coach img {
   display: inline-block;
   width: 70%;
@@ -170,6 +171,22 @@
 
 #coach.speaking {
   animation-name: coach-animation;
+  animation-duration: 2s;
+}
+
+@keyframes coach-animation-full-rotate {
+  0% {
+    transform: rotate(0deg);
+  } 85% {
+    transform: rotate(1845deg);
+  } 100% {
+    transform: rotate(1800deg);
+  }
+}
+
+
+#coach.full-rotate {
+  animation-name: coach-animation-full-rotate;
   animation-duration: 2s;
 }
 
