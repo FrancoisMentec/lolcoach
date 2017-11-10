@@ -158,9 +158,9 @@ class Stat {
       ? statsPlayer[ROLES[role]][STATS_NAME[this.name]]
       : NaN
     this.ratio = this.value / statsDivision[ROLES[role]][STATS_NAME[this.name]]
-    this.state = this.ratio < 0.95
+    this.state = this.ratio < 0.9
       ? 'bad'
-      : this.ratio <= 1.05
+      : this.ratio <= 1.1
         ? 'avg'
         : 'good'
     this.expanded = false
@@ -338,6 +338,15 @@ updateStatsAverage().then(() => {
         }]
       }
     })*/
+    let maxCount = 0
+    let maxRole = 'top'
+    for (let role in ROLES) {
+      if (statsPlayer[ROLES[role]] && statsPlayer[ROLES[role]].count > maxCount) {
+        maxCount = statsPlayer[ROLES[role]].count
+        maxRole = role
+      }
+    }
+    role = roleSelect.value = maxRole
     farming = new Stat('Farming');
     killParticipation = new Stat('Kill Participation');
     kda = new Stat('KDA');
