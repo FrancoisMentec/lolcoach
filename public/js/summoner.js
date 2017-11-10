@@ -400,9 +400,9 @@ class Coach {
       this.speakingLayout.removeChild(speak)
     })
     this.speakingLayout.appendChild(speak)
-    setTimeout(() => {
+    /*setTimeout(() => {
       this.speakingLayout.removeChild(speak)
-    }, 8000)
+    }, 8000)*/
     this.layout.scrollTop = this.layout.scrollHeight
     this.animate()
   }
@@ -502,10 +502,7 @@ updateStatsAverage().then(() => {
     rankName = nameParts[0].toLowerCase() + " " + nameParts[1];
     rankName = rankName.charAt(0).toUpperCase() + rankName.slice(1);
 
-    analysisInfo = document.createElement('div');
-    analysisInfo.innerHTML = "<span>Analyzed the " + statsPlayer['ALL']['count'] + " most recent games and compared stats to other " + rankName + " players</span>";
-    //statsLayout.appendChild(analysisInfo)
-    coach.say("<span>Analyzed the " + statsPlayer['ALL']['count'] + " most recent games and compared stats to other " + rankName + " players</span>");
+    coach.say(`<span>Analyzed the <b>${statsPlayer['ALL']['count']}</b> most recent games and compared stats to other <b>${rankName}</b> players.</span>`)
 
     // sort the stats based on the weakness ratio of the stat
     stats.sort((a,b) => { return a.ratio - b.ratio })

@@ -92,6 +92,7 @@
   animation-name: coach-speaking-animation;
   animation-duration: 1s;
   box-shadow: 0 4px 5px rgba(0,0,0,0.24);
+  cursor: pointer;
 }
 
 .coach-speaking:first-child {
@@ -110,6 +111,30 @@
   border-right: 15px solid transparent;
   border-bottom: 0 solid transparent;
   transform: rotate(15deg);
+}
+
+.coach-speaking::before {
+  transition: 0.2s;
+  content: "close";
+  font-family: Material-Icons;
+  color: white;
+  font-size: 2em;
+  position: absolute;
+  display: inline-block;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 36px;
+  text-align: center;
+  height: 36px;
+  line-height: 36px;
+  border-radius: 50%;
+  background-color: #F44336;
+  opacity: 0;
+}
+
+.coach-speaking:hover::before {
+  opacity: 1;
 }
 
 #coach {
