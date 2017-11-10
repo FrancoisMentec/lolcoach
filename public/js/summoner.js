@@ -337,37 +337,30 @@ class Stat {
           }
         }
       }
-    }
+    }*/
 
-    if (this.rankingDiv) {
-      this.statsDiv.removeChild(this.rankingDiv)
+    if (this.progressionDiv) {
+      this.statsDiv.removeChild(this.progressionDiv)
     }
-    this.rankingDiv = document.createElement('canvas')
-    this.rankingDiv.setAttribute('width', 250)
-    this.rankingDiv.setAttribute('height', 200)
-    this.statsDiv.appendChild(this.rankingDiv)
+    this.progressionDiv = document.createElement('canvas')
+    this.progressionDiv.setAttribute('width', 250)
+    this.progressionDiv.setAttribute('height', 200)
+    this.statsDiv.appendChild(this.progressionDiv)
 
-    this.rankingChart = new Chart(this.rankingDiv, {
+    this.progressionChart = new Chart(this.progressionDiv, {
         type: 'line',
         data: {
-          labels: labels,
+          labels: labelsP,
           datasets: [{
-              label: 'Others',
-              pointRadius: 2,
-              backgroundColor: 'rgba(244, 67, 54, 0.2)',
-              pointBackgroundColor: 'rgb(244, 67, 54)',
-              borderColor: 'rgb(244, 67, 54)',
-              data: dataOthers,
-          },{
               label: 'You',
-              pointRadius: 0,
+              pointRadius: 5,
               backgroundColor: 'rgba(0, 150, 136, 0.2)',
               pointBackgroundColor: 'rgb(0, 150, 136)',
               borderColor: 'rgb(0, 150, 136)',
-              data: dataYourself,
+              data: dataP,
           }]
         }
-    })*/
+    })
   }
 
   addToPage() {
