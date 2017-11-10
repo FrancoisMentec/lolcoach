@@ -8,8 +8,13 @@ var summoner = regexRes[2]
 var roleSelect = document.getElementById('role')
 var role = roleSelect.value
 roleSelect.addEventListener('change', e => {
-  role = roleSelect.value
-  updateAllStats()
+  if (typeof statsPlayer[ROLES[roleSelect.value]] !== 'undefined') {
+    role = roleSelect.value
+    updateAllStats()
+  } else {
+    alert('you never played ' + roleSelect.value)
+    roleSelect.value = role
+  }
 })
 
 document.getElementById('summoner-greeting').innerHTML = summoner
