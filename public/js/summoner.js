@@ -402,7 +402,7 @@ class Coach {
     this.speakingLayout.appendChild(speak)
     /*setTimeout(() => {
       this.speakingLayout.removeChild(speak)
-  }, 12000)
+  }, 12000)*/
     this.layout.scrollTop = this.layout.scrollHeight
     this.animate()
   }
