@@ -329,6 +329,15 @@ class Coach {
     this.speakingLayout = document.getElementById('coach-speaking-layout')
     this.layout = document.getElementById('coach-layout')
     this.coach = document.getElementById('coach')
+    this.counter = 0
+    this.coach.addEventListener('click', e => {
+      if (++this.counter >= 5) {
+        this.counter = 0
+        this.say('Stop it!!!')
+      } else {
+        this.animate()
+      }
+    })
   }
 
   say (sentence) {
@@ -336,10 +345,22 @@ class Coach {
     speak.classList.add('coach-speaking')
     speak.innerHTML = sentence
     this.speakingLayout.appendChild(speak)
+    this.layout.scrollTop = this.layout.scrollHeight
+    this.animate()
+  }
+
+  animate () {
     let old = this.coach
     this.coach = old.cloneNode(true)
+    this.coach.addEventListener('click', e => {
+      if (++this.counter >= 5) {
+        this.counter = 0
+        this.say('Stop it!!!')
+      } else {
+        this.animate()
+      }
+    })
     this.layout.replaceChild(this.coach, old)
-    this.layout.scrollTop = this.layout.scrollHeight
   }
 }
 
