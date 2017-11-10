@@ -378,14 +378,8 @@ class Coach {
     this.layout = document.getElementById('coach-layout')
     this.coach = document.getElementById('coach')
     this.counter = 0
-    this.coach.addEventListener('click', e => {
-      if (++this.counter >= 5) {
-        this.counter = 0
-        this.say('Stop it!!!')
-      } else {
-        this.animate()
-      }
-    })
+    this.rotating = false
+    this.bindCoach()
   }
 
   say (sentence) {
@@ -400,24 +394,33 @@ class Coach {
       this.speakingLayout.removeChild(speak)
     })
     this.speakingLayout.appendChild(speak)
-    setTimeout(() => {
+    /*setTimeout(() => {
       this.speakingLayout.removeChild(speak)
-    }, 8000)
+  }, 12000)*/
     this.layout.scrollTop = this.layout.scrollHeight
     this.animate()
+  }
+
+  bindCoach () {
+    this.coach.addEventListener('click', e => {
+      if (++this.counter >= 5) {
+        this.counter = 0
+        this.coach.classList.add('full-rotate')
+        this.rotating = true
+        setTimeout(() => {
+          this.coach.classList.remove('full-rotate')
+          this.rotating = false
+        }, 2000)
+      } else if (!this.rotating) {
+        this.animate()
+      }
+    })
   }
 
   animate () {
     let old = this.coach
     this.coach = old.cloneNode(true)
-    this.coach.addEventListener('click', e => {
-      if (++this.counter >= 5) {
-        this.counter = 0
-        this.say('Stop it!!!')
-      } else {
-        this.animate()
-      }
-    })
+    this.bindCoach()
     this.layout.replaceChild(this.coach, old)
   }
 }
@@ -502,10 +505,7 @@ updateStatsAverage().then(() => {
     rankName = nameParts[0].toLowerCase() + " " + nameParts[1];
     rankName = rankName.charAt(0).toUpperCase() + rankName.slice(1);
 
-    analysisInfo = document.createElement('div');
-    analysisInfo.innerHTML = "<span>Analyzed the " + statsPlayer['ALL']['count'] + " most recent games and compared stats to other " + rankName + " players</span>";
-    //statsLayout.appendChild(analysisInfo)
-    coach.say("<span>Analyzed the " + statsPlayer['ALL']['count'] + " most recent games and compared stats to other " + rankName + " players</span>");
+    coach.say(`<span>Analyzed the <b>${statsPlayer['ALL']['count']}</b> most recent games and compared stats to other <b>${rankName}</b> players.</span>`)
 
     // sort the stats based on the weakness ratio of the stat
     stats.sort((a,b) => { return a.ratio - b.ratio })
