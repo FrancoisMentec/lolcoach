@@ -23,8 +23,11 @@
 
 /* main layout */
 #main-layout {
-  display: flex;
   width: 100%;
+}
+
+#main-layout > * {
+  vertical-align: top;
 }
 
 #stats-layout {
@@ -34,13 +37,9 @@
 
 #overall-layout {
   display: inline-block;
-  width: 300px;
-}
-
-#overall-layout {
   box-sizing: border-box;
   width: 284px;
-  padding: 5px;
+  padding: 5px 5px 12px 5px;
   background-color: white;
   color: #323232;
   margin: 8px;
@@ -116,7 +115,9 @@
   margin: 8px;
   box-shadow: 2px 2px 10px rgba(0,0,0,0.24);
   border-radius: 50%;
-  background-color: #9C27B0;
+  background-color: #F44336;
+  user-select: none;
+  cursor: pointer;
 }
 
 @keyframes coach-animation {
