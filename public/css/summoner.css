@@ -2,6 +2,7 @@
   font-family: Roboto-Thin;
   font-size: 3em;
   padding: 8px;
+  width: calc(100% - 200px);
 }
 
 #summoner-greeting {
@@ -31,11 +32,6 @@
   width: calc(100% - 500px);
 }
 
-#coach-layout  {
-  display: inline-block;
-  width: 200px;
-}
-
 #overall-layout {
   display: inline-block;
   width: 300px;
@@ -51,6 +47,16 @@
 }
 
 /* coach */
+#coach-layout  {
+  position: fixed;
+  display: inline-block;
+  width: 200px;
+  height: 100%;
+  overflow: hidden;
+  top: 0;
+  right: 0;
+}
+
 #coach-speaking-layout {
   width: 100%;
 }

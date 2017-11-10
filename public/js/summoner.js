@@ -14,6 +14,8 @@ roleSelect.addEventListener('change', e => {
 
 document.getElementById('summoner-greeting').innerHTML = summoner
 
+const TERRIBLE_THRESHOLD = 0.5
+
 const LEAGUES = ['unranked', 'bronze', 'silver', 'gold', 'platinum', 'diamond', 'master', 'challenger']
 
 const ROLES = {
@@ -197,6 +199,9 @@ class Stat {
     this.statValueDiv.innerHTML = Math.round(this.value * 100) / 100
     this.statValueLayout.classList.remove(this.state)
     this.ratio = this.value / statsDivision[ROLES[role]][STATS_NAME[this.name]]
+    if (this.ratio < TERRIBLE_THRESHOLD) {
+      coach.say(`Your <b>${this.name}</b> as a <b>${role}</b> is terrible, you should work on it.`)
+    }
     this.state = this.ratio < 0.95
       ? 'bad'
       : this.ratio <= 1.05
@@ -317,6 +322,7 @@ class Coach {
     let old = this.coach
     this.coach = old.cloneNode(true)
     this.layout.replaceChild(this.coach, old)
+    this.layout.scrollTop = this.layout.scrollHeight
   }
 }
 
