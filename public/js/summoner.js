@@ -75,7 +75,7 @@ const STAT_ADVICES = {
       <li>Melee minions need two turret shots and one or two auto attacks, depending on your attack damage.</li>
       <li>You can use your spells to farm but don't waste all your mana unless you're planning to back.</li>
       <li>When you can't to back wait a wave that precede a cannon wave, push it fast (you can spend all your mana) then back, so if your opponent push the wave under your turret you'll loose less minions because the cannon can tank more shots.</li>
-      <li>Avoid sharing a lane as much as possible, unless you want to teamfight or prepare an objective the toplaner, the midlaner and the adc should be on different lanes.</li>
+      <li>Avoid sharing a lane as much as possible, unless you want to teamfight or prepare an objective the top laner, the mid laner and the adc should be on different lanes.</li>
     </ul>
     <b>Exercise idea :</b>
     <ul>
@@ -370,7 +370,7 @@ class Coach {
 }
 
 var coach = new Coach()
-coach.say('Hello fleshling! I am analyzing your stats, standby.');
+coach.say('Greetings fleshling! I am analyzing your stats, standby.');
 
 function updateRadar () {
   let labels = []
@@ -396,7 +396,7 @@ function updateRadar () {
     data: {
       labels: labels,
       datasets: [{
-        label: 'Yourself',
+        label: 'You',
         backgroundColor: 'rgba(0, 150, 136, 0.2)',
         pointBackgroundColor: 'rgb(0, 150, 136)',
         borderColor: 'rgb(0, 150, 136)',
@@ -441,6 +441,12 @@ updateStatsAverage().then(() => {
     for(var i = 0; i < stats.length; i++) {
         stats[i].addToPage()
     }
+
+    nameParts = statsPlayer['ALL']['rank'].split("_");
+    rankName = nameParts[0].toLowerCase() + " " + nameParts[1];
+    rankName = rankName.charAt(0).toUpperCase() + rankName.slice(1);
+
+    document.getElementById('info-layout').innerHTML = "<span>Analyzed the " + statsPlayer['ALL']['count'] + " most recent games and compared stats to other " + rankName + " players</span>";
 
     coach.say('Click on a stat to learn how to improve it.');
   })
