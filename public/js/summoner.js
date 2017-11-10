@@ -397,9 +397,7 @@ updateStatsAverage().then(() => {
     damageDealtToTurrets = new Stat('Damage Dealt to Turrets');
 
     // sort the stats based on the weakness ratio of the stat
-    console.log(stats);
     stats.sort(compare);
-    console.log(stats);
 
     for(var i = 0; i < stats.length; i++)
     {
