@@ -68,7 +68,7 @@ def getIDFromSummonerName(summonerName, region):
 		return summonerInfo['accountId'],summonerInfo['id']
 
 
-def getMatchList(accountID, region, beginTime = False, endTime = False):
+async def getMatchList(accountID, region, beginTime = False, endTime = False):
 	#https://na1.api.riotgames.com/lol/match/v3/matchlists/by-account/
 
 	# make sure the region is valid
@@ -99,30 +99,29 @@ def getWeekPlayerStats(accountID, region):
 	for i in range(0,4):
 		times.append({
 			"end": int(time.time())*1000 - (3-i) * 604800000,
-			"begin": int(time.time()) * 1000 - ((3-i)+1) * 604800000 + 1
+			"begin": int(time.time()) * 1000 - ((3-i)+1) * 604800000 + 1,
+			"week":i
 		})
-	
 	
 	#matchList = getMatchList(accountID, region, beginTime = begin, endTime = end)
 	
-	loopMatchList = asyncio.get_event_loop()
+	loop = asyncio.get_event_loop()
 	
 	matchLists = asyncio.gather(*[getMatchList(accountID, region, timeData['begin'], timeData['end']) for timeData in times])
 	
-	matchListInfo = loopMatchList.run_until_complete(matchLists)
+	matchListInfo = loop.run_until_complete(matchLists)
 
-	loopMatchList.close()
 	
-	print(matchListInfo)
+	matchIDs = []
 	
-	'''
-	# if "status" in matchList:
-		# return "Not Found"
-	
-	matchIDs = [ match['gameId'] for match in matchList['matches']]
-	
-
-	loop = asyncio.get_event_loop()
+	for ml in matchListInfo:
+		if "status" in ml:
+			continue
+		for match in ml['matches']:
+			matchIDs.append(match['gameId'])
+			
+	if len(matchIDs) == 0:
+		return "No data"
 
 	matches = asyncio.gather(*[getMatchData(matchID, region) for matchID in matchIDs])
 
@@ -130,7 +129,9 @@ def getWeekPlayerStats(accountID, region):
 
 	loop.close()
 
-	playerData = []
+	#playerData = []
+	
+	weekStats = {0:[],1:[],2:[],3:[]}
 	
 
 	for match in matchInfo:
@@ -181,7 +182,12 @@ def getWeekPlayerStats(accountID, region):
 
 		if (not playerRow['position'] in ["JUNGLE_NONE","TOP_SOLO","MIDDLE_SOLO","BOTTOM_DUO_CARRY","BOTTOM_DUO_SUPPORT"]) or (not playerRow['position'] in enemyPositions) or (not len(participantTimeline)>3):
 			continue
-			
+		
+		for t in times:
+			if match['gameCreation'] >= t['begin'] and match['gameCreation'] <= t['end']:
+				matchWeek = t['week']
+				break
+		
 		# KP
 		# Match timeline data
 		# csDiffPerMinDeltas
@@ -225,16 +231,19 @@ def getWeekPlayerStats(accountID, region):
 				playerRow["goldDiffPerMinDeltas"] = participantTimeline['goldPerMinDeltas']['0-10'] - e['goldPerMin']
 			
 		
-		playerData.append(playerRow)
-
-	df = pd.DataFrame(playerData)
-	sMean = df.mean()
-	sMean.name="ALL"
-	dfSend = df.groupby("position").mean()
-	dfSend['count'] = df.groupby("position").size()
-	sMean['count'] = dfSend['count'].sum()
-	dfSend = dfSend.append(sMean)
-	return dfSend.T.to_dict()'''
+		weekStats[matchWeek].append(playerRow)
+	
+	arraySend = []
+	for w in weekStats:
+		df = pd.DataFrame(weekStats[w])
+		sMean = df.mean()
+		sMean.name="ALL"
+		dfSend = df.groupby("position").mean()
+		dfSend['count'] = df.groupby("position").size()
+		sMean['count'] = dfSend['count'].sum()
+		dfSend = dfSend.append(sMean)
+		arraySend.append(dfSend.T.to_dict())
+	return arraySend
 
 	
 def getPlayerStats(summonerName, region):
