@@ -419,9 +419,8 @@ updateStatsAverage().then(() => {
   updateStatsPlayer().then(() => {
     // disable not played role
     let options = roleSelect.getElementsByTagName('option')
-    for (let o in options) {
+    for (let o = 0; o < options.length; o++) {
       let option = options[o]
-      console.log(option.value)
       if (typeof statsPlayer[ROLES[option.value]] === 'undefined') {
         option.disabled = true
       }
