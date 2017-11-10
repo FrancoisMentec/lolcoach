@@ -203,9 +203,12 @@ def getAverageStatsByAccountID(accountID, region):
 		playerData.append(playerRow)
 
 	df = pd.DataFrame(playerData)
-
+	sMean = df.mean()
+	sMean.name="ALL"
 	dfSend = df.groupby("position").mean()
 	dfSend['count'] = df.groupby("position").size()
+	sMean['count'] = dfSend['count'].sum()
+	dfSend = dfSend.append(sMean)
 	return dfSend.T.to_dict()
 
 	#return averageStats
@@ -216,7 +219,16 @@ def getAllStatsFromSummonerName(summonerName, region):
 
 	globalStats = getGlobalAverageStats(league)
 	playerStats = getAverageStatsByAccountID(accountID, region)
-
+	
+	playerStats["ALL"]["rank"] = league
+	
+	globalStatsAll = []
+	
+	for ps in playerStats:
+		if not ps == "ALL":
+			globalStatsAll.append(pd.Series(globalStats[ps]).multiply(playerStats[ps]['count']))
+	df = pd.DataFrame(globalStatsAll)
+	globalStats['ALL'] = df.sum().divide(playerStats["ALL"]["count"]).to_dict()
 	print(json.dumps({"global":globalStats,"player":playerStats}))
 
 getAllStatsFromSummonerName(player, region)
