@@ -346,6 +346,10 @@ class Coach {
   }
 
   say (sentence) {
+    var speakingLayout = document.getElementById("coach-speaking-layout");
+    while (speakingLayout.firstChild) {
+      speakingLayout.removeChild(speakingLayout.firstChild);
+    }
     let speak = document.createElement('div')
     speak.classList.add('coach-speaking')
     speak.innerHTML = sentence
@@ -447,15 +451,26 @@ updateStatsAverage().then(() => {
     damageDealtToObjectives = new Stat('Damage Dealt to Objectives');
     damageDealtToTurrets = new Stat('Damage Dealt to Turrets');
 
+    //stats-layout
+    nameParts = statsPlayer['ALL']['rank'].split("_");
+    rankName = nameParts[0].toLowerCase() + " " + nameParts[1];
+    rankName = rankName.charAt(0).toUpperCase() + rankName.slice(1);
+
+    analysisInfo = document.createElement('div');
+    analysisInfo.innerHTML = "<span>Analyzed the " + statsPlayer['ALL']['count'] + " most recent games and compared stats to other " + rankName + " players</span>";
+    //statsLayout.appendChild(analysisInfo)
+
+    //document.getElementById('stats-layout').innerHTML = "<span>Analyzed the " + statsPlayer['ALL']['count'] + " most recent games and compared stats to other " + rankName + " players</span>";
+
     // sort the stats based on the weakness ratio of the stat
     stats.sort((a,b) => { return a.ratio - b.ratio })
+
+    // add the stats to the page in the correct order
     for(var i = 0; i < stats.length; i++) {
         stats[i].addToPage()
     }
 
-    nameParts = statsPlayer['ALL']['rank'].split("_");
-    rankName = nameParts[0].toLowerCase() + " " + nameParts[1];
-    rankName = rankName.charAt(0).toUpperCase() + rankName.slice(1);
+
 
     document.getElementById('info-layout').innerHTML = "<span>Analyzed the " + statsPlayer['ALL']['count'] + " most recent games and compared stats to other " + rankName + " players</span>";
 
