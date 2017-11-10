@@ -354,8 +354,8 @@ function updateRadar () {
     document.getElementById('radar-layout').removeChild(radar)
   }
   radar = document.createElement('canvas')
-  radar.setAttribute('width', 284)
-  radar.setAttribute('height', 284)
+  radar.setAttribute('width', 274)
+  radar.setAttribute('height', 274)
   document.getElementById('radar-layout').appendChild(radar)
   radarChart = new Chart(radar, {
     type: 'radar',

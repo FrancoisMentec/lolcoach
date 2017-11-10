@@ -38,8 +38,10 @@
 }
 
 #radar-layout {
+  box-sizing: border-box;
   width: 284px;
   height: 284px;
+  padding: 5px;
   background-color: white;
   color: #323232;
   margin: 8px;
