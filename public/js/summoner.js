@@ -413,7 +413,7 @@ class Coach {
     this.coach.addEventListener('click', e => {
       if (++this.counter >= 5) {
         this.counter = 0
-        this.say('Stop it!!!')
+        this.say('Stop it fleshling!!!')
       } else {
         this.animate()
       }
