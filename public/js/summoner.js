@@ -49,6 +49,11 @@ const STAT_SHORT_UNITS = {
   'Damage Dealt to Turrets': 'D2T'
 }
 
+var radarLegend = document.getElementById('radar-legend')
+for (let stat in STAT_SHORT_UNITS) {
+  radarLegend.innerHTML += `${STAT_SHORT_UNITS[stat]} = ${stat} <br>`
+}
+
 // value should match the json webservice key
 const STATS_NAME = {
   'Farming': 'cs',
@@ -458,7 +463,7 @@ function updateRadar () {
         borderColor: 'rgb(0, 150, 136)',
         data: ystat
       },{
-        label: 'Others',
+        label: rankName,
         backgroundColor: 'rgba(244, 67, 54, 0.2)',
         pointBackgroundColor: 'rgb(244, 67, 54)',
         borderColor: 'rgb(244, 67, 54)',
@@ -489,6 +494,12 @@ updateStatsAverage().then(() => {
         }
       }
       role = roleSelect.value = maxRole
+      //stats-layout
+      nameParts = statsPlayer['ALL']['rank'].split("_");
+      rankName = nameParts[0].toLowerCase() + " " + nameParts[1];
+      rankName = rankName.charAt(0).toUpperCase() + rankName.slice(1);
+
+      coach.say(`<span>Analyzed the <b>${statsPlayer['ALL']['count']}</b> most recent games and compared stats to other <b>${rankName}</b> players.</span>`)
       // radar chart
       updateRadar()
       // create stats
@@ -500,13 +511,6 @@ updateStatsAverage().then(() => {
       damageDealtToChampions = new Stat('Damage Dealt to Champions');
       damageDealtToObjectives = new Stat('Damage Dealt to Objectives');
       damageDealtToTurrets = new Stat('Damage Dealt to Turrets');
-
-      //stats-layout
-      nameParts = statsPlayer['ALL']['rank'].split("_");
-      rankName = nameParts[0].toLowerCase() + " " + nameParts[1];
-      rankName = rankName.charAt(0).toUpperCase() + rankName.slice(1);
-
-      coach.say(`<span>Analyzed the <b>${statsPlayer['ALL']['count']}</b> most recent games and compared stats to other <b>${rankName}</b> players.</span>`)
 
       // sort the stats based on the weakness ratio of the stat
       stats.sort((a,b) => { return a.ratio - b.ratio })
