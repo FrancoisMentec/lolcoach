@@ -23,8 +23,11 @@
 
 /* main layout */
 #main-layout {
-  display: flex;
   width: 100%;
+}
+
+#main-layout > * {
+  vertical-align: top;
 }
 
 #stats-layout {
@@ -34,13 +37,9 @@
 
 #overall-layout {
   display: inline-block;
-  width: 300px;
-}
-
-#overall-layout {
   box-sizing: border-box;
   width: 284px;
-  padding: 5px;
+  padding: 5px 5px 12px 5px;
   background-color: white;
   color: #323232;
   margin: 8px;

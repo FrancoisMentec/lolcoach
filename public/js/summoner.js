@@ -19,6 +19,7 @@ const TERRIBLE_THRESHOLD = 0.5
 const LEAGUES = ['unranked', 'bronze', 'silver', 'gold', 'platinum', 'diamond', 'master', 'challenger']
 
 const ROLES = {
+  'player': 'ALL',
   'top': 'TOP_SOLO',
   'jungle': 'JUNGLE_NONE',
   'mid': 'MIDDLE_SOLO',
@@ -261,17 +262,19 @@ class Stat {
     let labels = []
     let dataOthers = []
     let dataYourself = []
-    for (let l = 0; l < LEAGUES.length; l++) {
-      let league = LEAGUES[l]
-      if (league === 'unranked' || league === 'master' || league === 'challenger') {
-        labels.push(league)
-        dataOthers.push(statsAverage[role][league][STATS_NAME[this.name]])
-        dataYourself.push(this.value)
-      } else {
-        for (let i = 5; i > 0; i--) {
-          labels.push(league + ' ' + i)
-          dataOthers.push(statsAverage[role][league][i][STATS_NAME[this.name]])
+    if (role !== 'player') {
+      for (let l = 0; l < LEAGUES.length; l++) {
+        let league = LEAGUES[l]
+        if (league === 'unranked' || league === 'master' || league === 'challenger') {
+          labels.push(league)
+          dataOthers.push(statsAverage[role][league][STATS_NAME[this.name]])
           dataYourself.push(this.value)
+        } else {
+          for (let i = 5; i > 0; i--) {
+            labels.push(league + ' ' + i)
+            dataOthers.push(statsAverage[role][league][i][STATS_NAME[this.name]])
+            dataYourself.push(this.value)
+          }
         }
       }
     }
