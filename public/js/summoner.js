@@ -349,6 +349,9 @@ class Coach {
     let speak = document.createElement('div')
     speak.classList.add('coach-speaking')
     speak.innerHTML = sentence
+    speak.addEventListener('click', e => {
+      this.speakingLayout.removeChild(speak)
+    })
     this.speakingLayout.appendChild(speak)
     this.layout.scrollTop = this.layout.scrollHeight
     this.animate()

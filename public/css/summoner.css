@@ -21,6 +21,10 @@
   background-color: rgba(255,255,255,0.2);
 }
 
+#info-layout {
+  margin: 0 8px 0 8px;
+}
+
 /* main layout */
 #main-layout {
   width: 100%;
