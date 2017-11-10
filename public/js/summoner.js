@@ -88,36 +88,41 @@ const STAT_ADVICES = {
   <b>Advice:</b>
   <ul>
     <li>If you have several deaths, start playing safer and closer to turrets.</li>
+    <li>Improving your vision can prevent you from gank.</li>
+    <li>Don't let your teammates bait you, if they're doing something stupid let them die and try to take something somewhere else to compensate.</li>
+    <li>Always watch your map, especially other lanes, if you die from opponent's roaming it's because you didn't watched the map, not because your ally didn't pinged miss.</li>
   </ul>
   `,
   'Vision Score': `
   <b>Advice:</b>
   <ul>
-    <li>Wards save lives.</li>
+    <li>Use your trinket and if you're using a sweeper upgrade it at level 9 (it's free).</li>
   </ul>
   `,
   'Vision Wards': `
   <b>Advice:</b>
   <ul>
-    <li>Vision Wards save lives.</li>
+    <li>Never leave the base with a free slot and 75 gold, always keep a pink on you, even if you already have one on the map.</li>
   </ul>
   `,
   'Damage Dealt to Champions': `
   <b>Advice:</b>
   <ul>
-    <li>Do more damage to your opponent than they do to you.</li>
+    <li>Every time you have the opportunity to deal safe damage do it, even if it seems useless it will make a difference on the long term.</li>
+    <li>If you're gonna die use everything so your teamates may have the opportunity to clean up.</li>
   </ul>
   `,
   'Damage Dealt to Objectives': `
   <b>Advice:</b>
   <ul>
-    <li>Taking objectives is a good way to gain an advantage over the enemy team.</li>
+    <li>Objectives are more important than kill, never chase if you can take a turret or a drake.</li>
+    <li>approximately : Nexus > nashor > inhibitor > first turret > drake > turret > kill</li>
   </ul>
   `,
   'Damage Dealt to Turrets': `
   <b>Advice:</b>
   <ul>
-    <li>Destroying turrets is a good way to gain an advantage over the enemy team.</li>
+    <li>After a successfull gank you should go for turret, ask your jungle to stay and help you to push.</li>
   </ul>
   `
 }
