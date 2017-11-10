@@ -168,16 +168,23 @@ def getAverageStatsByAccountID(accountID, region):
 		for participant in match['participants']:
 			totalKills[participant['teamId']] += participant['stats']['kills']
 			
-			if not participant['teamId'] == teamId:
-				enemyEarlyDeltaGold.append({"lane":participant['timeline']['lane'], "role":participant['timeline']['role'], "goldPerMin":participant['timeline']['goldPerMinDeltas']['0-10']})
-				enemyPositions.append(participant['timeline']['lane'] + "_" + participant['timeline']['role'])
+			if not participant['teamId'] == teamId :
+				if "goldPerMinDeltas" in participant['timeline']:
+					if participant['timeline']['lane'] + "_" + participant['timeline']['role'] == "MIDDLE_DUO_SUPPORT":
+						enemyPositions.append("JUNGLE_NONE")
+						enemyEarlyDeltaGold.append({"lane":"JUNGLE", "role":"NONE", "goldPerMin":participant['timeline']['goldPerMinDeltas']['0-10']})
+					else:
+						enemyPositions.append(participant['timeline']['lane'] + "_" + participant['timeline']['role'])
+						enemyEarlyDeltaGold.append({"lane":participant['timeline']['lane'], "role":participant['timeline']['role'], "goldPerMin":participant['timeline']['goldPerMinDeltas']['0-10']})
 			
 			if participant['participantId'] == participantID:
 				participantStats = participant['stats']
 				participantTimeline = participant['timeline']
 				playerRow['position'] = participant['timeline']['lane'] + "_" + participant['timeline']['role']
+				if playerRow['position'] == "MIDDLE_DUO_SUPPORT":
+					playerRow['position'] = "JUNGLE_NONE"
 
-		if (not playerRow['position'] in ["JUNGLE_NONE","TOP_SOLO","MIDDLE_SOLO","BOTTOM_DUO_CARRY","BOTTOM_DUO_SUPPORT"]) and (not playerRow['position'] in enemyPositions):
+		if (not playerRow['position'] in ["JUNGLE_NONE","TOP_SOLO","MIDDLE_SOLO","BOTTOM_DUO_CARRY","BOTTOM_DUO_SUPPORT"]) or (not playerRow['position'] in enemyPositions) or (not len(participantTimeline)>3):
 			continue
 
 		# KP
@@ -213,9 +220,9 @@ def getAverageStatsByAccountID(accountID, region):
 		playerRow["neutralMinionsKilledEnemyJungle"] = participantStats['neutralMinionsKilledEnemyJungle'] *60 / match['gameDuration']
 		playerRow["damageDealtToChampions"] = participantStats['totalDamageDealtToChampions']
 		
-		playerRow["csDiffPerMinDeltas"] = participantTimeline['csDiffPerMinDeltas']['0-10']
-		playerRow["damageTakenDiffPerMinDeltas"] = participantTimeline['damageTakenDiffPerMinDeltas']['0-10']
-		playerRow["xpDiffPerMinDeltas"] = participantTimeline['xpDiffPerMinDeltas']['0-10']
+		playerRow["csDiffPerMinDeltas"] = participantTimeline['csDiffPerMinDeltas']['0-10'] if "csDiffPerMinDeltas" in participantTimeline else 0
+		playerRow["damageTakenDiffPerMinDeltas"] = participantTimeline['damageTakenDiffPerMinDeltas']['0-10'] if "damageTakenDiffPerMinDeltas" in participantTimeline else 0
+		playerRow["xpDiffPerMinDeltas"] = participantTimeline['xpDiffPerMinDeltas']['0-10'] if "xpDiffPerMinDeltas" in participantTimeline else 0
 		
 		for e in enemyEarlyDeltaGold:
 			if playerRow['position'] == e["lane"] + "_" + e['role']:

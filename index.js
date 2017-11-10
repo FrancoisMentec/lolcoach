@@ -96,6 +96,21 @@ app.get('/stats/:region/:summoner', (req, res) => {
   })
 })
 
+app.get('/weekStats/:region/:summoner', (req, res) => {
+  child_process.exec(`${python} python/get-player-weekly-stats.py ${req.params.region} "${req.params.summoner}"`, (err, stdout, stderr) => {
+    if (err) {
+      console.error(err)
+    } else {
+      if (stderr.length > 0) {
+        res.send(stderr)
+      } else {
+		res.setHeader('Content-Type', 'application/json');
+        res.send(stdout)
+      }
+    }
+  })
+})
+
 app.get('*', (req, res) => {
   res.redirect('/')
 })
